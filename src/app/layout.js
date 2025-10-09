@@ -1,7 +1,7 @@
 import "./globals.css";
-import AuthGuard from "@/components/authguard";
-import SessionWrapper from "@/components/sessionwrapper";
-import { NavPathChecker } from "@/components/sessionwrapper";
+import AuthGuard from "@/app/utils/authguard";
+import SessionWrapper from "@/app/utils/sessionwrapper";
+import { NavPathChecker } from "@/app/utils/sessionwrapper";
 // import { Inter } from "next/font/google";
 
 // const inter = Inter({ subsets: ['latin'] });

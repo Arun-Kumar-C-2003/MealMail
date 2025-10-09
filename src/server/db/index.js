@@ -91,4 +91,4 @@ class DBConnect {
 
 const dbInstance = new DBConnect();
 export default DBConnect;
-export const clientPromise = dbInstance.connect().then(db => db.client);
+// export const clientPromise = dbInstance.connect().then(db => db.client);

@@ -1,24 +1,79 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { ProfileIcon, LikeIcon } from "./svgicons";
+import {
+  ProfileIcon,
+  LikeIcon,
+  LogoutIcon,
+  AddIcon,
+  NotificationIcon,
+  CartIcon,
+  HamburgerIcon,
+  CrossIcon,
+} from "./svgicons";
 
 export default function NavBar() {
   const { data: session, status } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  if (status === "loading") return null;
-
+  const buttonRef = useRef();
+  const menuRef = useRef();
+  
   const mainLinks = ["home", "explore", "contact", "FAQs", "about"];
   const userLinks = [
-    { href: "/profile", label: session?.user?.name || "Guest", icon: ProfileIcon },
-    { href: "/notification", label: "Notification", icon: "🔔" },
-    { href: "/addrecipe", label: "Add Recipe", icon: "➕" },
-    { href: "/saved", label: "Saved", icon: LikeIcon},
-    { href: "/cart", label: "Cart", icon: "🛒" },
+    {
+      href: "/profile",
+      label: session?.user?.name || "Guest",
+      icon: <ProfileIcon classname="w-5 h-5 fill-orange-600" />,
+    },
+    {
+      href: "/notification",
+      label: "Notification",
+      icon: <NotificationIcon classname="w-5 h-5 fill-orange-600" />,
+    },
+    {
+      href: "/addrecipe",
+      label: "Add Recipe",
+      icon: <AddIcon classname="w-5 h-5 fill-orange-600" />,
+    },
+    {
+      href: "/saved",
+      label: "Saved",
+      icon: <LikeIcon classname="w-5 h-5 fill-orange-600" />,
+    },
+    {
+      href: "/cart",
+      label: "Cart",
+      icon: <CartIcon classname="w-5 h-5 fill-orange-600" />,
+    },
   ];
-
+  
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        menuOpen &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target) &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target)
+      ) {
+        setMenuOpen(false);
+      }
+    }
+    
+    function handleEscKey(event) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscKey);
+    };
+  }, [menuOpen]);
   const handleLinkClick = () => setMenuOpen(false);
+  if (status === "loading") return null;
 
   return (
     <header className="bg-white shadow mb-5">
@@ -44,49 +99,28 @@ export default function NavBar() {
             </li>
           ))}
         </ul>
-
+        <button>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <title>share</title>
+            <path d="M21,12L14,5V9C7,10 4,15 3,20C5.5,16.5 9,14.9 14,14.9V19L21,12Z" />
+          </svg>
+        </button>
         {/* Hamburger Icon (always visible) */}
         <button
+          ref={buttonRef}
           onClick={() => setMenuOpen((prev) => !prev)}
           className="text-orange-600 hover:text-orange-700 focus:outline-none transition-transform duration-200"
           aria-label="Toggle menu"
         >
-          {menuOpen ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-7 w-7"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-7 w-7"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          )}
+          {menuOpen ? <CrossIcon /> : <HamburgerIcon />}
         </button>
 
         {/* Dropdown Menu */}
         {menuOpen && (
-          <div className="absolute right-4 top-16 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          <div
+            ref={menuRef}
+            className="absolute right-4 top-16 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+          >
             <ul className="flex flex-col py-2">
               {/* On mobile, show main links too */}
               <div className="md:hidden">
@@ -127,9 +161,10 @@ export default function NavBar() {
                     handleLinkClick();
                     signOut({ callbackUrl: "/login" });
                   }}
-                  className="w-full text-left flex items-center px-4 py-2 text-red-600 hover:bg-red-50 hover:text-red-700"
+                  className="w-full text-left flex items-center px-4 py-2 hover:bg-red-50 hover:text-orange-600"
                 >
-                  🚪 <span className="ml-2">Logout</span>
+                  <LogoutIcon classname="w-5 h-5 fill-orange-600" />{" "}
+                  <span className="ml-2">Logout</span>
                 </button>
               </li>
             </ul>

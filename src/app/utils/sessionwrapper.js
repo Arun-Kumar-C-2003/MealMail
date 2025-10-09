@@ -1,7 +1,7 @@
 "use client";
 import { SessionProvider } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import NavBar from "./navbar";
+import NavBar from "../../components/navbar";
 
 export const NavPathChecker = () => {
   const pathname = usePathname();

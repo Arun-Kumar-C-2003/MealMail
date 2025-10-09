@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { Spinner } from './home';
 
 export default function RecipeDetails() {
   const searchParams = useSearchParams();
@@ -30,7 +31,8 @@ export default function RecipeDetails() {
     }
   }, [id]);
 
-  if (loading) return <p className="text-center mt-10 text-gray-600">Loading recipe...</p>;
+  if (loading) return <Spinner/>
+  // <p className="text-center mt-10 text-gray-600">Loading recipe...</p>;
   if (!recipe) return <p className="text-center mt-10 text-red-600">Recipe not found.</p>;
 
   const ingredients = [];
