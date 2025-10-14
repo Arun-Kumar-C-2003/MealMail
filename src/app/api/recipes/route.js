@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
-import { getAllRecipes, createRecipe } from "@/server/services/recipeservice";
+import { getAllRecipes, createRecipe, getUserRecipes } from "@/server/services/recipeservice";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/server/auth/authoptions";
 
 export async function GET() {
   try {
-    const recipes = await getAllRecipes();
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      console.log("Unauthenticated");
+      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+    }
+    const recipes = await getUserRecipes(session.user?.id);
     console.log("Found recipes:", recipes.length);
     return NextResponse.json(recipes);
   } catch (error) {
@@ -17,8 +24,15 @@ export async function GET() {
 
 export async function POST(request) {
   try {
+    //Get the userId from the session
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse(
+        { error: "User is not Authenticated" },
+        { status: 401 }
+      );
+    }
     const formData = await request.formData();
-
     const title = formData.get("title");
     const description = formData.get("description");
     const dietary = formData.get("dietary");
@@ -45,6 +59,7 @@ export async function POST(request) {
     const recipeData = {
       title,
       description,
+      userId: session?.user?.id,
       dietary,
       category,
       ingredients,
@@ -55,7 +70,7 @@ export async function POST(request) {
     };
 
     const result = await createRecipe(recipeData);
-
+    console.log(recipeData.id);
     if (!result) {
       return NextResponse.json(
         { error: "Failed to create recipe" },

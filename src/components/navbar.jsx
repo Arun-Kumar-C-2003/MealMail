@@ -11,6 +11,8 @@ import {
   HamburgerIcon,
   CrossIcon,
 } from "./svgicons";
+import Link from "next/link";
+
 
 export default function NavBar() {
   const { data: session, status } = useSession();
@@ -79,23 +81,23 @@ export default function NavBar() {
     <header className="bg-white shadow mb-5">
       <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 py-5 relative">
         {/* Logo */}
-        <a
+        <Link
           href="/home"
           className="text-2xl font-bold text-orange-600 hover:text-orange-500"
         >
           Meal Mail
-        </a>
+        </Link>
 
         {/* Center Nav (desktop only) */}
         <ul className="hidden md:flex flex-1 justify-center space-x-6">
           {mainLinks.map((link) => (
             <li key={link}>
-              <a
+              <Link
                 href={`/${link === "home" ? "home" : link}`}
                 className="text-gray-800 p-2 bg-transparent hover:bg-gray-50 rounded font-medium transition"
               >
                 {link.charAt(0).toUpperCase() + link.slice(1)}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -126,13 +128,13 @@ export default function NavBar() {
               <div className="md:hidden">
                 {mainLinks.map((link) => (
                   <li key={`mobile-${link}`}>
-                    <a
+                    <Link
                       href={`/${link === "home" ? "home" : link}`}
                       className="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition"
                       onClick={handleLinkClick}
                     >
                       {link.charAt(0).toUpperCase() + link.slice(1)}
-                    </a>
+                    </Link>
                   </li>
                 ))}
                 <hr className="my-2 border-gray-200" />
@@ -141,14 +143,14 @@ export default function NavBar() {
               {/* User Section (always in dropdown) */}
               {userLinks.map((item) => (
                 <li key={item.href}>
-                  <a
+                  <Link
                     href={item.href}
                     className="flex items-center px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                     onClick={handleLinkClick}
                   >
                     <span className="mr-2">{item.icon}</span>
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
 
