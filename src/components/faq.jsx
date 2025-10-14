@@ -37,7 +37,7 @@ export default function Faq() {
   ];
 
   return (
-    <div className="px-6 md:px-12 max-w-4xl">
+    <div className="px-6 md:px-12 max-w-4xl ">
       <h2 className="text-2xl font-semibold mb-2">Frequently Asked Questions</h2>
       <p className="text-sm text-gray-600 mb-4">
         Find answers to common questions about Meal Mail
@@ -51,9 +51,9 @@ export default function Faq() {
         className="w-full md:w-3/4 p-2 border border-gray-300 rounded mb-6 focus:outline-none focus:ring-2 focus:ring-accent"
       />
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         {faqData.map((item, index) => (
-          <div key={index} className="border border-gray-300 rounded">
+          <div key={index} className="border border-gray-300 rounded mb-3">
             <button
               onClick={() => toggleAccordion(index)}
               className="w-full text-left px-4 py-3 font-medium bg-gray-100 hover:bg-gray-200 flex justify-between items-center"
@@ -72,7 +72,7 @@ export default function Faq() {
             </button>
 
             {openIndex === index && (
-              <div className="px-4 py-3 text-gray-700 bg-white border-t border-gray-200">
+              <div className="px-4 py-3 text-gray-700  bg-white border-t border-gray-200">
                 {item.answer}
               </div>
             )}
