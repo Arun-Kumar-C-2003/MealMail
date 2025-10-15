@@ -45,7 +45,24 @@ class DBConnect {
       const db = await this.connect();
       const tableCollection = db.collection(collectionName);
       // const tableCollection = db.collection(tableName);
-      const find = await tableCollection.find({}).toArray();
+      const find = await tableCollection
+        .aggregate([
+          {
+            $lookup: {
+              from: "users",
+              let: { userIdObj: { $toObjectId: "$userId" } }, // convert string → ObjectId
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userIdObj"] } } },
+                { $project: { username: 1 } },
+              ],
+              as: "user",
+            },
+          },
+          { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        ])
+        .toArray();
+
+      // console.log("This is from index.js", find);
       return find;
     } catch (error) {
       console.error("Error Getting Data", error);

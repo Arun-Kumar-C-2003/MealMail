@@ -1,7 +1,7 @@
 // import dbInstance from '@/server/db/index';
 import DBConnect from "@/server/db/index";
 import { ObjectId } from "mongodb";
-import { NextResponse } from "next/server";
+
 const collectionName = "recipes";
 const db = new DBConnect();
 // const db = await dbInstance.connect();
@@ -9,6 +9,7 @@ const db = new DBConnect();
 export async function getAllRecipes() {
   try {
     const recipes = await db.getAll(collectionName);
+    // console.log('This is form recipeServic.js',recipes);
     return recipes;
   } catch (error) {
     console.error("Error fetching recipes:", error);
