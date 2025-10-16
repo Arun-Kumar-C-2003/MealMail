@@ -1,6 +1,5 @@
 import { getAllRecipes } from "@/server/services/recipeservice";
 import { NextResponse } from "next/server";
- 
 
 export async function GET() {
   try {

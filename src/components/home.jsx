@@ -110,7 +110,7 @@ export default function Home() {
             <input
               type="search"
               placeholder="Search recipes, chefs, restaurants..."
-              className="w-full rounded-lg border-2 bg-gray-50 border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:border-transparent focus:ring-orange-500"
+              className="w-full rounded-4xl border-2 bg-gray-50 border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:border-transparent focus:ring-orange-500"
             />
           </div>
         </div>
@@ -130,7 +130,9 @@ export default function Home() {
                     <ProfileRoundedIcon />
                   </span>
                   <span className="text-gray-600 font-medium">
-                    {recipe?.user?.username ? recipe?.user?.username : "MealMail"}
+                    {recipe?.user?.username
+                      ? recipe?.user?.username
+                      : "MealMail"}
                   </span>
                 </div>
                 <span className="text-orange-600 cursor-pointer">Follow</span>

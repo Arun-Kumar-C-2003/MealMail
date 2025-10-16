@@ -13,13 +13,12 @@ import {
 } from "./svgicons";
 import Link from "next/link";
 
-
 export default function NavBar() {
   const { data: session, status } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const buttonRef = useRef();
   const menuRef = useRef();
-  
+
   const mainLinks = ["home", "explore", "contact", "FAQs", "about"];
   const userLinks = [
     {
@@ -48,7 +47,7 @@ export default function NavBar() {
       icon: <CartIcon classname="w-5 h-5 fill-orange-600" />,
     },
   ];
-  
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -61,7 +60,7 @@ export default function NavBar() {
         setMenuOpen(false);
       }
     }
-    
+
     function handleEscKey(event) {
       if (event.key === "Escape") {
         setMenuOpen(false);
@@ -163,7 +162,7 @@ export default function NavBar() {
                     handleLinkClick();
                     signOut({ callbackUrl: "/login" });
                   }}
-                  className="w-full text-left flex items-center px-4 py-2 hover:bg-red-50 hover:text-orange-600"
+                  className="w-full text-left text-gray-700 flex items-center px-4 py-2 hover:bg-red-50 hover:text-orange-600"
                 >
                   <LogoutIcon classname="w-5 h-5 fill-orange-600" />{" "}
                   <span className="ml-2">Logout</span>

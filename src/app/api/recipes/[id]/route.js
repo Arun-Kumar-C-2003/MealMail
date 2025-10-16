@@ -5,9 +5,8 @@ import {
 } from "@/server/services/recipeservice";
 import { NextResponse } from "next/server";
 
-export async function GET(request, context) {
+export async function GET(request, { params }) {
   try {
-    const { params } = await context;
     const { id } = await params;
 
     if (!id) {

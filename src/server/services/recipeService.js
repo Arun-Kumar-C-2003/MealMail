@@ -25,20 +25,36 @@ export async function getUserRecipes(userId) {
   }
 }
 
+// export async function oldGetRecipeById(id) {
+//   try {
+//     // Validate ID format first
+//     if (!ObjectId.isValid(id)) {
+//       console.error("Invalid Id");
+//       return null; // Return null instead of throwing
+//     }
+//     console.log("Service called");
+//     const recipes = db.getOne({ _id: new ObjectId(id) }, collectionName);
+//     return recipes;
+//     // const db = await dbInstance.connect();
+//     // const recipesCollection = db.collection('recipes');
+//     // const recipe = await recipesCollection.findOne({ _id: new ObjectId(id) });
+
+//     // return recipe;
+//   } catch (error) {
+//     console.error("Error in getRecipeById:", error);
+//     return null;
+//   }
+// }
+
 export async function getRecipeById(id) {
   try {
-    // Validate ID format first
     if (!ObjectId.isValid(id)) {
       console.error("Invalid Id");
-      return null; // Return null instead of throwing
+      return null;
     }
-    const recipes = db.getOne({ _id: new ObjectId(id) }, collectionName);
-    return recipes;
-    // const db = await dbInstance.connect();
-    // const recipesCollection = db.collection('recipes');
-    // const recipe = await recipesCollection.findOne({ _id: new ObjectId(id) });
 
-    // return recipe;
+    const recipe = await db.getOne({ _id: new ObjectId(id) }, collectionName);
+    return recipe;
   } catch (error) {
     console.error("Error in getRecipeById:", error);
     return null;
