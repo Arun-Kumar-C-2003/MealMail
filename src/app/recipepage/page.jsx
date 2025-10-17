@@ -152,7 +152,7 @@ export default function ModernRecipePage() {
               naan, roti, or steamed basmati rice.
             </p>
           </div>
-           {/* Review Box */}
+          {/* Review Box */}
           <div className="pt-5 px-3 md:p-6 pb-6 bg-white mt-3  rounded-xl">
             <div className="flex justify-between items-baseline ">
               <span className="font-medium">Reviews(125)</span>
@@ -171,7 +171,7 @@ export default function ModernRecipePage() {
               ></textarea>
             </div>
             <div className="flex justify-end text-white mt-2 ">
-              <button className="bg-amber-500 hover:bg-amber-400 transition ease-in duration-150 text-center rounded-full p-2">
+              <button className="bg-amber-500 cursor-pointer hover:bg-amber-400 transition ease-in duration-150 text-center rounded-full p-2">
                 Post Review
               </button>
             </div>
@@ -218,6 +218,8 @@ export default function ModernRecipePage() {
             </div>
           </div>
         </div>
+
+        {/* Profile and Related recipes */}
         <div className="profile-recipes">
           {/* Profile Content */}
           <div className="profile-content bg-white py-5 mt-5 md:mt-0 px-20 rounded-xl">
@@ -292,7 +294,7 @@ export default function ModernRecipePage() {
                     className="w-20 h-20 object-cover rounded-xl"
                   />
                   <div>
-                    <h2 className="font-semibold text-lg">{item.name}</h2>
+                    <h5 className="font-semibold text-lg">{item.name}</h5>
                     <div className="flex items-center text-gray-600 text-sm">
                       <span className="text-yellow-500 mr-1">★</span>
                       <span>{item.rating}</span>
@@ -304,7 +306,29 @@ export default function ModernRecipePage() {
               ))}
             </div>
           </div>
-         
+          <div className="bg-white rounded-xl py-5 mt-5   px-5">
+            <h5 className="font-bold mb-3 flex text-xl">Related Recipes</h5>
+            <div className=" relative rounded-xl  bg-gray-50">
+              <img
+                src="/images/carouselimg1.jpg"
+                alt="chef"
+                className="w-full object-cover cursor-pointer  rounded-t-2xl"
+              />
+              <button className="absolute top-5 cursor-pointer right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition">
+                <LikeFilledIcon classname="fill-gray-500 w-4 sm:w-5 md:w-6" />
+              </button>
+              <div className="py-2 px-3">
+                <h5 className="font-medium text-lg mb-1">Perfect Beef Tenderloin</h5>
+                <p className="text-sm text-gray-700">Perfectly seared tenderloin with red wine reduction</p>
+                <div className="flex justify-between mt-3">
+                  <p>
+                    <span className="text-yellow-500 mr-1">★</span>
+                    4.8</p>
+                  <p>20 mins</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>
