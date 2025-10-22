@@ -287,7 +287,7 @@ export default function ModernRecipePage() {
                 //   image: images[2],
                 // },
               ].map((item, idx) => (
-                <div key={idx} className="flex items-center gap-4">
+                <div key={idx} className="flex items-center gap-4 cursor-pointer bg-transparent hover:bg-white/30 hover:shadow p-1 hover:p-1 transition-colors duration-300 ease-in-out  rounded-xl">
                   <img
                     src={item.image}
                     alt={item.name}
@@ -308,22 +308,27 @@ export default function ModernRecipePage() {
           </div>
           <div className="bg-white rounded-xl py-5 mt-5   px-5">
             <h5 className="font-bold mb-3 flex text-xl">Related Recipes</h5>
-            <div className=" relative rounded-xl  bg-gray-50">
+            <div className=" relative rounded-xl shadow-lg bg-gray-50 hover:scale-105 transition-transform duration-150 ease-in-out">
               <img
                 src="/images/carouselimg1.jpg"
                 alt="chef"
-                className="w-full object-cover cursor-pointer  rounded-t-2xl"
+                className="w-full  object-cover cursor-pointer  rounded-t-2xl"
               />
               <button className="absolute top-5 cursor-pointer right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition">
                 <LikeFilledIcon classname="fill-gray-500 w-4 sm:w-5 md:w-6" />
               </button>
               <div className="py-2 px-3">
-                <h5 className="font-medium text-lg mb-1">Perfect Beef Tenderloin</h5>
-                <p className="text-sm text-gray-700">Perfectly seared tenderloin with red wine reduction</p>
+                <h5 className="font-medium text-lg mb-1">
+                  Perfect Beef Tenderloin
+                </h5>
+                <p className="text-sm text-gray-700">
+                  Perfectly seared tenderloin with red wine reduction
+                </p>
                 <div className="flex justify-between mt-3">
                   <p>
                     <span className="text-yellow-500 mr-1">★</span>
-                    4.8</p>
+                    4.8
+                  </p>
                   <p>20 mins</p>
                 </div>
               </div>
