@@ -28,7 +28,7 @@ export default function CreateRecipe() {
   const [inputs, setInputs] = useState([""]); // start with one input
   const inputRefs = useRef([]);
   const textInputRefs = useRef([]);
-  const isFirstRender = useRef(true);
+  // const isFirstRender = useRef(true);
   const isAddingNewInput = useRef(false);
 
   const handleInputChange = (setter) => (e) => {
