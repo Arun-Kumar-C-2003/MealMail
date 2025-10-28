@@ -48,7 +48,7 @@ export async function POST(request) {
 
     let images = [];
 
-    for (const [index,file] of imageFiles.entries()) {
+    for (const [index, file] of imageFiles.entries()) {
       if (file && typeof file.arrayBuffer === "function") {
         const buffer = Buffer.from(await file.arrayBuffer());
         const base64 = buffer.toString("base64");

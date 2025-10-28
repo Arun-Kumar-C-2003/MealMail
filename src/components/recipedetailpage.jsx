@@ -1,19 +1,56 @@
+"use client";
 import { CartIcon, LikeFilledIcon, ShareIcon } from "@/components/svgicons";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function ModernRecipePage() {
-  const images = [
-    "/images/cooking.jpg",
-    "/images/cooking.jpg",
-    "/images/cooking.jpg",
-    "/images/cooking.jpg",
-  ];
+export default function RecipeDetailPage() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const [recipe, setRecipe] = useState(null);
+  // const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    async function fetchRecipeData() {
+      try {
+        const response = await fetch(`/api/recipes/${id}`);
+        const data = await response.json();
+        if (data) {
+          setRecipe(Array.isArray(data) ? data[0] : data);
+        }
+      } catch (error) {
+        console.error("Error in Recipedetailpage useeffect", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (id) fetchRecipeData();
+  }, [id]);
+
+  // const images = [
+  //   "/images/cooking.jpg",
+  //   "/images/cooking.jpg",
+  //   "/images/cooking.jpg",
+  //   "/images/cooking.jpg",
+  // ];
+  const imgs = recipe?.images || [];
+  const coverImage = imgs[0]?.url;
+  const images = imgs.filter((i) => !i?.isCover && i?.url).map((i) => i.url);
+
+  if (loading) return <Spinner />;
+  if (!recipe)
+    return <p className="text-center mt-10 text-red-600">Recipe not found.</p>;
+
+  const ingredients = recipe.ingredients
+    ? recipe.ingredients.map((item) => `${item.quantity} ${item.name}`)
+    : [];
   return (
     <>
+      <div className="pt-16"></div>
       <div className="head-container m-4 sm:m-7 md:flex md:gap-6 overflow-hidden">
         {/* Main Image */}
         <div className="main-img-container  relative w-full max-w-xl  aspect-video">
           <img
-            src="/images/food.jpg"
+            src={coverImage}
             alt="cooking image"
             className="rounded-xl  w-full h-full object-cover"
           />
@@ -26,10 +63,10 @@ export default function ModernRecipePage() {
           {/* Labels */}
           <div className="absolute md:top-[59%] top-[77%]   left-3 flex flex-wrap gap-2">
             <span className="bg-black/75 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
-              25 min
+              {recipe?.servings} mins
             </span>
             <span className="bg-green-500/90 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
-              Vegetarian
+              {recipe?.dietary}
             </span>
           </div>
           {/* Sub Images */}
@@ -48,12 +85,13 @@ export default function ModernRecipePage() {
         <div className="overall-detail md:flex flex-col">
           <div className="recipe-main">
             <h1 className="recipe-title font-bold text-black/75 text-2xl md:text-4xl md:mb-3 mt-1">
-              Creamy Truffle Pasta
+              {recipe?.title}
             </h1>
             <p className="description md:text-lg text-gray-600 text-left">
-              Rich and indulgent pasta with truffle cream sauce, perfectly
+              {/* Rich and indulgent pasta with truffle cream sauce, perfectly
               balanced with parmesan cheese and fresh herbs. This
-              restaurant-quality dish brings luxury dining to your home kitchen.
+              restaurant-quality dish brings luxury dining to your home kitchen. */}
+              {recipe?.description}
             </p>
           </div>
           <div className="flex items-center md:mt-3 gap-2 md:gap-7 mt-3 ">
@@ -73,8 +111,8 @@ export default function ModernRecipePage() {
           <div className="recipe-counts mt-2 flex justify-between md:justify-normal md:gap-18 text-center">
             {[
               { value: "4.8", label: "Rating" },
-              { value: "25", label: "Minutes" },
-              { value: "4", label: "Servings" },
+              { value: recipe?.cookTime, label: "Minutes" },
+              { value: recipe?.servings, label: "Servings" },
               { value: "343", label: "Likes" },
             ].map((item) => (
               <div key={item.label}>
@@ -108,7 +146,9 @@ export default function ModernRecipePage() {
               <h3 className="font-medium text-xl">Ingredients</h3>
               <span className="flex gap-2  text-gray-600 ">
                 Servings:
-                <p className="text-black font-medium text-xl">4</p>
+                <p className="text-black font-medium text-xl">
+                  {recipe?.servings}
+                </p>
               </span>
             </div>
             <p className="mt-3 text-gray-700 text-justify">
@@ -287,7 +327,10 @@ export default function ModernRecipePage() {
                 //   image: images[2],
                 // },
               ].map((item, idx) => (
-                <div key={idx} className="flex items-center gap-4 cursor-pointer bg-transparent hover:bg-white/30 hover:shadow p-1 hover:p-1 transition-colors duration-300 ease-in-out  rounded-xl">
+                <div
+                  key={idx}
+                  className="flex items-center gap-4 cursor-pointer bg-transparent hover:bg-white/30 hover:shadow p-1 hover:p-1 transition-colors duration-300 ease-in-out  rounded-xl"
+                >
                   <img
                     src={item.image}
                     alt={item.name}
@@ -337,5 +380,13 @@ export default function ModernRecipePage() {
         </div>
       </div>
     </>
+  );
+}
+
+export function Spinner() {
+  return (
+    <div className="flex items-center justify-center  mx-auto h-screen">
+      <span className="w-6  h-6 border-4 border-dashed rounded-full animate-spin border-orange-600"></span>
+    </div>
   );
 }

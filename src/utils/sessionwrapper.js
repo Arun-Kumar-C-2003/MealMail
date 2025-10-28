@@ -5,7 +5,7 @@ import NavBar from "../components/navbar";
 
 export const NavPathChecker = () => {
   const pathname = usePathname();
-  const hideNavBar = ["/", "/login","/home/home2", "/signup"];
+  const hideNavBar = ["/", "/login", "/home/home2", "/signup"];
   const showNavBar = !hideNavBar.includes(pathname);
   return showNavBar ? <NavBar /> : null;
 };

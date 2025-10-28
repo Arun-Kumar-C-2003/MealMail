@@ -207,6 +207,7 @@ export default function CreateRecipe() {
 
   return (
     <>
+      <div className="pt-16"></div>
       <div className="hero-div bg-amber-100 px-3 py-5 text-center">
         <h4 className="font-medium text-3xl">Create Your Recipe</h4>
         <p className="text-xs text-gray-500">
@@ -467,7 +468,7 @@ export default function CreateRecipe() {
             value="Cancel"
             onClick={(e) => {
               e.preventDefault();
-              router.push("/home");
+              router.back();
             }}
             className="bg-stone-800 cursor-pointer p-2 rounded-full w-full text-white "
           />

@@ -1,177 +1,154 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
-import { useSession, signOut } from "next-auth/react";
-import {
-  ProfileIcon,
-  LikeIcon,
-  LogoutIcon,
-  AddIcon,
-  NotificationIcon,
-  CartIcon,
-  HamburgerIcon,
-  CrossIcon,
-} from "./svgicons";
 import Link from "next/link";
+import {
+  HomeIcon,
+  AddIcon,
+  LikeFilledIcon,
+  CartIcon,
+  ProfileIcon,
+  SearchIcon,
+  StoreIcon,
+  DeliveryIcon,
+} from "./svgicons";
+
+import { usePathname, useRouter } from "next/navigation";
 
 export default function NavBar() {
-  const { data: session, status } = useSession();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const buttonRef = useRef();
-  const menuRef = useRef();
-
-  const mainLinks = ["home", "explore", "contact", "FAQs", "about"];
-  const userLinks = [
-    {
-      href: "/profile",
-      label: session?.user?.name || "Guest",
-      icon: <ProfileIcon classname="w-5 h-5 fill-orange-600" />,
-    },
-    {
-      href: "/notification",
-      label: "Notification",
-      icon: <NotificationIcon classname="w-5 h-5 fill-orange-600" />,
-    },
-    {
-      href: "/addrecipe",
-      label: "Add Recipe",
-      icon: <AddIcon classname="w-5 h-5 fill-orange-600" />,
-    },
-    {
-      href: "/saved",
-      label: "Saved",
-      icon: <LikeIcon classname="w-5 h-5 fill-orange-600" />,
-    },
-    {
-      href: "/cart",
-      label: "Cart",
-      icon: <CartIcon classname="w-5 h-5 fill-orange-600" />,
-    },
+  const navLinks = [
+    { linkTo: "home", linkName: "Home" },
+    { linkTo: "addrecipe", linkName: "Create" },
+    { linkTo: "order", linkName: "Order" },
+    { linkTo: "stores", linkName: "Stores" },
   ];
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        menuOpen &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target) &&
-        menuRef.current &&
-        !menuRef.current.contains(event.target)
-      ) {
-        setMenuOpen(false);
-      }
-    }
+  const iconsPath = [
+    { icon: HomeIcon, link: "home" },
+    { icon: SearchIcon, link: "search" },
+    { icon: AddIcon, link: "addrecipe" },
+    { icon: StoreIcon, link: "stores" },
+  ];
+  const pathname = usePathname();
+  const isLogoActive = pathname === navLinks[0].linkTo;
+  // const isActive = navLinks.some((link) => pathname === `/${link.linkTo}`);
 
-    function handleEscKey(event) {
-      if (event.key === "Escape") {
-        setMenuOpen(false);
-      }
+  const navigator = (href) => {
+    const router = useRouter();
+    if (router.pathname !== href) {
+      router.push(href);
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscKey);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscKey);
-    };
-  }, [menuOpen]);
-  const handleLinkClick = () => setMenuOpen(false);
-  if (status === "loading") return null;
+  };
 
   return (
-    <header className="bg-white shadow mb-5">
-      <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 py-5 relative">
-        {/* Logo */}
-        <Link
-          href="/home"
-          className="text-2xl font-bold text-orange-600 hover:text-orange-500"
-        >
-          Meal Mail
-        </Link>
-
-        {/* Center Nav (desktop only) */}
-        <ul className="hidden md:flex flex-1 justify-center space-x-6">
-          {mainLinks.map((link) => (
-            <li key={link}>
-              <Link
-                href={`/${link === "home" ? "home" : link}`}
-                className="text-gray-800 p-2 bg-transparent hover:bg-gray-50 rounded font-medium transition"
-              >
-                {link.charAt(0).toUpperCase() + link.slice(1)}
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <button>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <title>share</title>
-            <path d="M21,12L14,5V9C7,10 4,15 3,20C5.5,16.5 9,14.9 14,14.9V19L21,12Z" />
-          </svg>
-        </button>
-        {/* Hamburger Icon (always visible) */}
-        <button
-          ref={buttonRef}
-          onClick={() => setMenuOpen((prev) => !prev)}
-          className="text-orange-600 hover:text-orange-700 focus:outline-none transition-transform duration-200"
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <CrossIcon /> : <HamburgerIcon />}
-        </button>
-
-        {/* Dropdown Menu */}
-        {menuOpen && (
-          <div
-            ref={menuRef}
-            className="absolute right-4 top-16 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+    <>
+      <header className="bg-white fixed z-50 top-0 shadow w-full">
+        <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3 relative">
+          <Link
+            href="/home"
+            aria-disabled={isLogoActive}
+            className="text-2xl font-bold text-white bg-amber-500 p-2 rounded-md hover:bg-amber-400 transition-colors duration-150 ease-in "
           >
-            <ul className="flex flex-col py-2">
-              {/* On mobile, show main links too */}
-              <div className="md:hidden">
-                {mainLinks.map((link) => (
-                  <li key={`mobile-${link}`}>
-                    <Link
-                      href={`/${link === "home" ? "home" : link}`}
-                      className="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition"
-                      onClick={handleLinkClick}
-                    >
-                      {link.charAt(0).toUpperCase() + link.slice(1)}
-                    </Link>
-                  </li>
-                ))}
-                <hr className="my-2 border-gray-200" />
-              </div>
-
-              {/* User Section (always in dropdown) */}
-              {userLinks.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
-                    onClick={handleLinkClick}
-                  >
-                    <span className="mr-2">{item.icon}</span>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-
-              <hr className="my-2 border-gray-200" />
-
-              {/* Logout Button */}
-              <li>
-                <button
-                  onClick={() => {
-                    handleLinkClick();
-                    signOut({ callbackUrl: "/login" });
-                  }}
-                  className="w-full text-left text-gray-700 flex items-center px-4 py-2 hover:bg-red-50 hover:text-orange-600"
+            MealMail
+          </Link>
+          <ul className="hidden md:flex flex-1 ml-10 md:space lg:space-x-5 text-lg ">
+            {navLinks.map((link, index) => {
+              const href = `/${link.linkTo}`;
+              const isActive = pathname === href;
+              return (
+                <Link
+                  key={`${link.linkName + index}`}
+                  href={href}
+                  // href={`/${link.linkTo == "home" ? "home" : link.linkTo}`}
+                  aria-disabled={isActive}
+                  className={`${
+                    isActive ? "text-amber-500" : "text-black/90"
+                  } p-2 bg-transparent  hover:text-amber-500 rounded-md  transition-colors duration-150 ease-in`}
                 >
-                  <LogoutIcon classname="w-5 h-5 fill-orange-600" />{" "}
-                  <span className="ml-2">Logout</span>
-                </button>
-              </li>
-            </ul>
+                  {/* {link.charAt(0).toUpperCase() + link.slice(1)} */}
+                  {link.linkName}
+                </Link>
+              );
+            })}
+          </ul>
+
+          <div className="flex space-x-7 items-center">
+            <div className="hidden md:flex items-center border border-gray-600 rounded-full p-1 focus-within:border-transparent focus-within:ring-2 focus-within:ring-amber-500">
+              {/* Icon */}
+              <SearchIcon classname="fill-gray-400 w-8 h-8" />
+
+              {/* Input */}
+              <input
+                type="text"
+                placeholder="Search recipes, creators..."
+                className="ml-2 w-full outline-none bg-transparent"
+              />
+            </div>
+
+            {/* Liked Recipes Button */}
+            <button title="liked">
+              <LikeFilledIcon classname="w-6 cursor-pointer h-6 transition-colors duration-150 ease-in hover:fill-amber-500 fill-gray-700" />
+            </button>
+
+            {/* Cart Button */}
+            <button title="cart">
+              <CartIcon
+                classname={`w-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer h-6 fill-gray-700`}
+              />
+            </button>
+
+            {/* Profile Icon => User Profile Appears Instead of Icon */}
+            <button title="profile">
+              <ProfileIcon
+                classname={`w-6 h-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer fill-gray-700`}
+              />
+            </button>
           </div>
-        )}
-      </nav>
-    </header>
+        </nav>
+      </header>
+
+      {/* Bottom Navigation for mobile devices */}
+      <footer className="md:hidden flex w-full fixed z-50 bottom-0 bg-gray-800 py-2 px-10 rounded-t-md">
+        <div className="w-full text-white flex justify-between">
+          {iconsPath.map((item, index) => {
+            const href = `/${item.link}`;
+            const isActive = pathname === href;
+            return (
+              <Link
+                key={`${item.link + index}`}
+                href={href}
+                // href={`/${link.linkTo == "home" ? "home" : link.linkTo}`}
+                aria-disabled={isActive}
+                className={`${
+                  isActive ? "bg-amber-500 rounded-md" : ""
+                }  fill-gray-200 w-7 h-7  transition-colors duration-300 p-1 ease-in-out`}
+              >
+                {/* {link.charAt(0).toUpperCase() + link.slice(1)} */}
+                <item.icon />
+              </Link>
+            );
+          })}
+        </div>
+      </footer>
+    </>
   );
+}
+
+{
+  /* <div className="w-full text-white flex justify-between">
+  <button>
+    <HomeIcon classname={`fill-gray-200 w-5 h-5`} />
+  </button>
+  <button>
+    <SearchIcon classname={`fill-gray-200 w-5 h-5`} />
+  </button>
+  <button>
+    <AddIcon classname={`fill-gray-200 w-5 h-5`} />
+  </button>
+  <button>
+    <StoreIcon classname={`fill-gray-200 w-5 h-5`} />
+  </button>
+</div>; */
+}
+
+{
+  /* <DeliveryIcon classname={`fill-gray-200 w-5 h-5`} /> */
 }
