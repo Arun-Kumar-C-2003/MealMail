@@ -12,9 +12,22 @@ import {
   StoreIcon,
 } from "@/components/svgicons";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function HomePageNew() {
+  const randomBG = [
+    "bg-blue-500/80",
+    "bg-red-500/80",
+    "bg-green-500/80",
+    "bg-yellow-500/80",
+    "bg-cyan-500/80",
+    "bg-purple-500/80",
+    "bg-orange-500/80",
+    "bg-sky-500/80",
+    "bg-teal-500/80",
+    "bg-emerald-500/80",
+  ];
+ 
   const filterOptions = [
     "All",
     "Pure veg",
@@ -27,12 +40,36 @@ export default function HomePageNew() {
   const [selectedOption, setSelectedOption] = useState(filterOptions[0]);
   const [likeState, setLikeState] = useState(false);
   const [followState, setFollowState] = useState(false);
+  const [userRecipes, setUserRecipes] = useState([]);
+  const [totalRecipes, setTotalRecipes] = useState(0);
 
   // Data to Get
   const amount = "Rs. 250";
   const type = "Non-vegetarian";
-  const time = "20 mins";
+  const time = "20";
 
+  useEffect(() => {
+    async function getAllUserRecipes() {
+      try {
+        const response = await fetch("/api/recipes/user_recipes");
+        console.log("Getting Recipes");
+        // src\app\api\recipes\user_recipes\route.js
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setUserRecipes(data);
+          setTotalRecipes(data.length);
+        } else {
+          setUserRecipes([]);
+          setTotalRecipes(0);
+        }
+      } catch (error) {
+        console.error("Error in Home page getting user recipes:", error);
+        setUserRecipes([]);
+        setTotalRecipes(0);
+      }
+    }
+    getAllUserRecipes();
+  }, []);
   return (
     <>
       <NavBar />
@@ -104,226 +141,259 @@ export default function HomePageNew() {
         </div>
         <hr className="border-t border-gray-300" />
 
-        <div className="bg-gray-100 p-3 mb-5 md:mb-0 flex gap-y-5 md:gap-x-5 justify-center flex-col md:flex-row">
-          
-          {/* Recipe Card */}
-          <div className="rounded-2xl bg-white  pb-1 ">
-            <div className="relative">
-              <img
-                src="/images/carouselimg1.jpg"
-                alt="chef"
-                className="w-full h-44 object-cover cursor-pointer  rounded-t-2xl"
-              />
-              <div className=" absolute bottom-2  left-2 flex flex-wrap gap-1">
-                <span className="bg-black/70 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
-                  {time}
-                </span>
-                <span className="bg-red-500/80 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
-                  {type}
-                </span>
-              </div>
-              <button
-                onClick={() => setLikeState(!likeState)}
-                className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition"
+        <div className="bg-gray-100 p-3 md:px-8 mb-5 grid gap-5 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 ">
+          {userRecipes.slice(0, totalRecipes).map((recipe, index) => {
+            const randomBGClass = randomBG[index % randomBG.length];
+
+            return (
+              //Recipe Cards
+              <div
+                key={recipe._id}
+                className="rounded-2xl transition-all border border-transparent duration-200 ease-in-out hover:shadow-xl hover:border-black/80 bg-white   pb-1 "
               >
-                <LikeFilledIcon
-                  classname={`fill-gray-500  w-4 sm:w-5 md:w-6 cursor-pointer`}
-                />
-              </button>
-              <span className="absolute top-0 bg-rose-500/90 font-medium rounded-tl-xl rounded-br-xl p-1 text-white text-center">
-                {amount}
-              </span>
-            </div>
-            <div className="p-2">
-              <h5 className="font-medium text-xl text-black/90">
-                Creamy Truffle Pasta
-              </h5>
-              <p className="text-gray-700">
-                Rich and indulgent pasta with truffle cream sauce
-              </p>
-            </div>
+                <div className="relative">
+                  {recipe.images && recipe.images.length > 0 ? (
+                    <img
+                      src={
+                        recipe.images.find((img) => img.isCover)?.url ||
+                        "/images/cooking.jpg"
+                      }
+                      alt={recipe.title}
+                      className="w-full h-44  object-cover cursor-pointer  rounded-t-2xl"
+                      onClick={() =>
+                        router.push(`/recipedetails?id=${recipe._id}`)
+                      }
+                    />
+                  ) : (
+                    <img
+                      src={recipe?.image?.url || "/images/cooking.jpg"}
+                      alt={recipe.title}
+                      className="w-full h-44  object-cover cursor-pointer  rounded-t-2xl"
+                      onClick={() =>
+                        router.push(`/recipedetails?id=${recipe._id}`)
+                      }
+                    />
+                  )}
+                  <div className=" absolute bottom-2  left-2 flex flex-wrap gap-1">
+                    <span className="bg-black/70 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
+                      {recipe?.cookTime ?? time} mins
+                    </span>
+                    <span
+                      className={`${randomBGClass} p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 `}
+                    >
+                      {recipe.dietary}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setLikeState(!likeState)}
+                    className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition"
+                  >
+                    <LikeFilledIcon
+                      classname={`fill-gray-500  w-4 sm:w-5 md:w-6 cursor-pointer`}
+                    />
+                  </button>
+                  <span className="absolute top-0 bg-rose-500/90 font-medium rounded-tl-2xl rounded-br-xl p-1 text-white text-center">
+                    Rs.180
+                  </span>
+                </div>
+                <div className="p-2">
+                  <h5 className="font-medium text-xl text-black/90">
+                    {recipe.title}
+                  </h5>
+                  <p className="text-gray-700">{recipe.description}</p>
+                </div>
 
-            <div className="px-3 pb-2 flex justify-between items-center">
-              <div className="flex   gap-2 items-center">
-                <img
-                  src="/images/chef2.jpg"
-                  alt="chef"
-                  className="w-8 aspect-square object-cover  cursor-pointer  rounded-full"
-                />
-                <p>Chef Marco</p>
-                <button
-                  onClick={() => setFollowState(!followState)}
-                  className={`bg-orange-400 text-white py-0.5 px-2 cursor-pointer transition-colors duration-150 ease-in rounded-full`}
-                >
-                  {/* {followState ? "Following" : "Follow"} */}
-                  Follow
-                </button>
+                <div className="px-3 pb-2 flex justify-between items-center">
+                  <div className="flex   gap-2 items-center">
+                    <img
+                      src="/images/chef2.jpg"
+                      alt="chef"
+                      className="w-8 aspect-square object-cover  cursor-pointer  rounded-full"
+                    />
+                    <p>
+                      {" "}
+                      {recipe?.user?.username
+                        ? recipe?.user?.username
+                        : "MealMail"}
+                    </p>
+                    <button
+                      onClick={() => setFollowState(!followState)}
+                      className={`bg-orange-400 text-sm text-white py-0.5 px-2 cursor-pointer transition-colors duration-150 ease-in rounded-full`}
+                    >
+                      {/* {followState ? "Following" : "Follow"} */}
+                      Follow
+                    </button>
+                  </div>
+                  <p className="font-medium">
+                    <span className="text-amber-500">★</span>4.8
+                  </p>
+                </div>
+
+                {/* Order & Share button only,Like at top */}
+                <div className="w-full flex justify-start gap-1 p-2">
+                  <button className="w-[55%] flex gap-1 items-center justify-center border border-amber-500  rounded-full p-2">
+                    <CartIcon classname={`fill-black w-4 h-4`} />
+                    Order
+                  </button>
+                  <button className="bg-black/50 flex gap-1 justify-center w-[35%]  text-white py-2 px-3 rounded-full">
+                    <ShareIcon classname={`fill-white w-5 h-5`} />
+                    Share
+                  </button>
+                </div>
               </div>
-              <p className="font-medium">
-                <span className="text-amber-500">★</span>4.8
-              </p>
-            </div>
-
-            {/* Order & Share button only,Like at top */}
-            <div className="w-full flex gap-1 p-2">
-              <button className="w-full flex gap-1 items-center justify-center bg-amber-500 text-white rounded-full p-2">
-                <CartIcon classname={`fill-white w-4 h-4`} />
-                Order
-              </button>
-              <button className="bg-black/50 flex gap-1 items-center  text-white py-2 px-3 rounded-full">
-                <ShareIcon classname={`fill-white w-5 h-5`} />
-                Share
-              </button>
-            </div>
-          </div>
-
-          {/* Recipe Card */}
-          <div className="rounded-2xl bg-white  pb-1 ">
-            <div className="relative">
-              <img
-                src="/images/carouselimg2.jpg"
-                alt="chef"
-                className="w-full h-44  object-cover cursor-pointer  rounded-t-2xl"
-              />
-              <div className=" absolute bottom-2  left-2 flex flex-wrap gap-1">
-                <span className="bg-black/70 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
-                  {time}
-                </span>
-                <span className="bg-sky-500/80 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
-                  Snack
-                </span>
-              </div>
-              <button
-                onClick={() => setLikeState(!likeState)}
-                className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition"
-              >
-                <LikeFilledIcon
-                  classname={`fill-gray-500  w-4 sm:w-5 md:w-6 cursor-pointer`}
-                />
-              </button>
-              <span className="absolute top-0 bg-rose-500/90 font-medium rounded-tl-xl rounded-br-xl p-1 text-white text-center">
-                Rs.180
-              </span>
-            </div>
-            <div className="p-2">
-              <h5 className="font-medium text-xl text-black/90">
-                Creamy Truffle Pasta
-              </h5>
-              <p className="text-gray-700">
-                Rich and indulgent pasta with truffle cream sauce
-              </p>
-            </div>
-
-            <div className="px-3 pb-2 flex justify-between items-center">
-              <div className="flex   gap-2 items-center">
-                <img
-                  src="/images/chef2.jpg"
-                  alt="chef"
-                  className="w-8 aspect-square object-cover  cursor-pointer  rounded-full"
-                />
-                <p>Chef Marco</p>
-                <button
-                  onClick={() => setFollowState(!followState)}
-                  className={`bg-orange-400 text-white py-0.5 px-2 cursor-pointer transition-colors duration-150 ease-in rounded-full`}
-                >
-                  {/* {followState ? "Following" : "Follow"} */}
-                  Follow
-                </button>
-              </div>
-              <p className="font-medium">
-                <span className="text-amber-500">★</span>4.8
-              </p>
-            </div>
-
-            {/* Order & Share button only,Like at top */}
-            <div className="w-full flex gap-1 p-2">
-              <button className="w-full flex gap-1 items-center justify-center bg-amber-500 text-white rounded-full p-2">
-                <CartIcon classname={`fill-white w-4 h-4`} />
-                Order
-              </button>
-              <button className="bg-black/50 flex gap-1 items-center  text-white py-2 px-3 rounded-full">
-                <ShareIcon classname={`fill-white w-5 h-5`} />
-                Share
-              </button>
-            </div>
-          </div>
-          
-          {/* Recipe Card */}
-          <div className="rounded-2xl bg-white  pb-1 ">
-            <div className="relative">
-              <img
-                src="/images/carouselimg3.jpg"
-                alt="chef"
-                className="w-full h-44 object-cover cursor-pointer  rounded-t-2xl"
-              />
-              <div className=" absolute bottom-2  left-2 flex flex-wrap gap-1">
-                <span className="bg-black/70 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
-                  {time}
-                </span>
-                <span className="bg-green-500/80 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
-                  Dessert
-                </span>
-              </div>
-              <button
-                onClick={() => setLikeState(!likeState)}
-                className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition"
-              >
-                <LikeFilledIcon
-                  classname={`fill-gray-500  w-4 sm:w-5 md:w-6 cursor-pointer`}
-                />
-              </button>
-              <span className="absolute top-0 bg-rose-500/90 font-medium rounded-tl-xl rounded-br-xl p-1 text-white text-center">
-                Rs.140
-              </span>
-            </div>
-            <div className="p-2">
-              <h5 className="font-medium text-xl text-black/90">
-                Creamy Truffle Pasta
-              </h5>
-              <p className="text-gray-700">
-                Rich and indulgent pasta with truffle cream sauce
-              </p>
-            </div>
-
-            <div className="px-3 pb-2 flex justify-between items-center">
-              <div className="flex   gap-2 items-center">
-                <img
-                  src="/images/chef2.jpg"
-                  alt="chef"
-                  className="w-8 aspect-square object-cover  cursor-pointer  rounded-full"
-                />
-                <p>Chef Marco</p>
-                <button
-                  onClick={() => setFollowState(!followState)}
-                  className={`bg-orange-400 text-white py-0.5 px-2 cursor-pointer transition-colors duration-150 ease-in rounded-full`}
-                >
-                  {/* {followState ? "Following" : "Follow"} */}
-                  Follow
-                </button>
-              </div>
-              <p className="font-medium">
-                <span className="text-amber-500">★</span>4.8
-              </p>
-            </div>
-
-            {/* Order & Share button only,Like at top */}
-            <div className="w-full flex gap-1 p-2">
-              <button className="w-full flex gap-1 items-center justify-center bg-amber-500 text-white rounded-full p-2">
-                <CartIcon classname={`fill-white w-4 h-4`} />
-                Order
-              </button>
-              <button className="bg-black/50 flex gap-1 items-center  text-white py-2 px-3 rounded-full">
-                <ShareIcon classname={`fill-white w-5 h-5`} />
-                Share
-              </button>
-            </div>
-          </div>
-
+            );
+          })}
         </div>
       </div>
     </>
   );
 }
+
+{
+  /* Recipe Card */
+}
+// <div className="rounded-2xl bg-white  pb-1 ">
+//   <div className="relative">
+//     <img
+//       src="/images/carouselimg3.jpg"
+//       alt="chef"
+//       className="w-full h-44 object-cover cursor-pointer  rounded-t-2xl"
+//     />
+//     <div className=" absolute bottom-2  left-2 flex flex-wrap gap-1">
+//       <span className="bg-black/70 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
+//         {time}
+//       </span>
+//       <span className="bg-green-500/80 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
+//         Dessert
+//       </span>
+//     </div>
+//     <button
+//       onClick={() => setLikeState(!likeState)}
+//       className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition"
+//     >
+//       <LikeFilledIcon
+//         classname={`fill-gray-500  w-4 sm:w-5 md:w-6 cursor-pointer`}
+//       />
+//     </button>
+//     <span className="absolute top-0 bg-rose-500/90 font-medium rounded-tl-xl rounded-br-xl p-1 text-white text-center">
+//       Rs.140
+//     </span>
+//   </div>
+//   <div className="p-2">
+//     <h5 className="font-medium text-xl text-black/90">
+//       Creamy Truffle Pasta
+//     </h5>
+//     <p className="text-gray-700">
+//       Rich and indulgent pasta with truffle cream sauce
+//     </p>
+//   </div>
+
+//   <div className="px-3 pb-2 flex justify-between items-center">
+//     <div className="flex   gap-2 items-center">
+//       <img
+//         src="/images/chef2.jpg"
+//         alt="chef"
+//         className="w-8 aspect-square object-cover  cursor-pointer  rounded-full"
+//       />
+//       <p>Chef Marco</p>
+//       <button
+//         onClick={() => setFollowState(!followState)}
+//         className={`bg-orange-400 text-white py-0.5 px-2 cursor-pointer transition-colors duration-150 ease-in rounded-full`}
+//       >
+//         {/* {followState ? "Following" : "Follow"} */}
+//         Follow
+//       </button>
+//     </div>
+//     <p className="font-medium">
+//       <span className="text-amber-500">★</span>4.8
+//     </p>
+//   </div>
+
+//   {/* Order & Share button only,Like at top */}
+//   <div className="w-full flex gap-1 p-2">
+//     <button className="w-full flex gap-1 items-center justify-center bg-amber-500 text-white rounded-full p-2">
+//       <CartIcon classname={`fill-white w-4 h-4`} />
+//       Order
+//     </button>
+//     <button className="bg-black/50 flex gap-1 items-center  text-white py-2 px-3 rounded-full">
+//       <ShareIcon classname={`fill-white w-5 h-5`} />
+//       Share
+//     </button>
+//   </div>
+// </div>
+
+{
+  /* Recipe Card */
+}
+// <div className="rounded-2xl bg-white  pb-1 ">
+//   <div className="relative">
+//     <img
+//       src="/images/carouselimg1.jpg"
+//       alt="chef"
+//       className="w-full h-44 object-cover cursor-pointer  rounded-t-2xl"
+//     />
+//     <div className=" absolute bottom-2  left-2 flex flex-wrap gap-1">
+//       <span className="bg-black/70 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
+//         {time}
+//       </span>
+//       <span className="bg-red-500/80 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
+//         {type}
+//       </span>
+//     </div>
+//     <button
+//       onClick={() => setLikeState(!likeState)}
+//       className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition"
+//     >
+//       <LikeFilledIcon
+//         classname={`fill-gray-500  w-4 sm:w-5 md:w-6 cursor-pointer`}
+//       />
+//     </button>
+//     <span className="absolute top-0 bg-rose-500/90 font-medium rounded-tl-xl rounded-br-xl p-1 text-white text-center">
+//       {amount}
+//     </span>
+//   </div>
+//   <div className="p-2">
+//     <h5 className="font-medium text-xl text-black/90">
+//       Creamy Truffle Pasta
+//     </h5>
+//     <p className="text-gray-700">
+//       Rich and indulgent pasta with truffle cream sauce
+//     </p>
+//   </div>
+
+//   <div className="px-3 pb-2 flex justify-between items-center">
+//     <div className="flex   gap-2 items-center">
+//       <img
+//         src="/images/chef2.jpg"
+//         alt="chef"
+//         className="w-8 aspect-square object-cover  cursor-pointer  rounded-full"
+//       />
+//       <p>Chef Marco</p>
+//       <button
+//         onClick={() => setFollowState(!followState)}
+//         className={`bg-orange-400 text-white py-0.5 px-2 cursor-pointer transition-colors duration-150 ease-in rounded-full`}
+//       >
+//         {/* {followState ? "Following" : "Follow"} */}
+//         Follow
+//       </button>
+//     </div>
+//     <p className="font-medium">
+//       <span className="text-amber-500">★</span>4.8
+//     </p>
+//   </div>
+
+//   {/* Order & Share button only,Like at top */}
+//   <div className="w-full flex gap-1 p-2">
+//     <button className="w-full flex gap-1 items-center justify-center bg-amber-500 text-white rounded-full p-2">
+//       <CartIcon classname={`fill-white w-4 h-4`} />
+//       Order
+//     </button>
+//     <button className="bg-black/50 flex gap-1 items-center  text-white py-2 px-3 rounded-full">
+//       <ShareIcon classname={`fill-white w-5 h-5`} />
+//       Share
+//     </button>
+//   </div>
+// </div>
 
 export function NavBar() {
   const navLinks = [

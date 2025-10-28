@@ -18,11 +18,18 @@ const formatFileSize = (bytes) => {
   return `${megabytes.toFixed(2)} MB`;
 };
 
-export default function ImageUploader() {
+export default function ImageUploader({ onChange }) {
   const [images, setImages] = useState([]);
   const fileInputRef = useRef(null);
 
   // Cleanup Object URLs
+  // Notify parent when images change
+  useEffect(() => {
+    if (typeof onChange === "function") {
+      onChange(images);
+    }
+  }, [images, onChange]);
+
   useEffect(() => {
     return () => {
       images.forEach((image) => URL.revokeObjectURL(image.preview));
@@ -31,44 +38,52 @@ export default function ImageUploader() {
 
   // --- Dropzone Logic ---
   const onDrop = useCallback((acceptedFiles, fileRejections) => {
-  // Handle rejections
-  fileRejections.forEach(({ file, errors }) => {
-    errors.forEach((err) => {
-      if (err.code === "file-too-large" || file.size > MAX_SIZE) {
-        alert(`File "${file.name}" is too large. Max size is ${formatFileSize(MAX_SIZE)}.`);
-      } else if (err.code === "too-many-files") {
-        alert(`Maximum of ${MAX_FILES} images allowed.`);
-      } else if (err.code === "file-invalid-type") {
-        alert(`File "${file.name}" is not an accepted image type.`);
-      }
+    // Handle rejections
+    fileRejections.forEach(({ file, errors }) => {
+      errors.forEach((err) => {
+        if (err.code === "file-too-large" || file.size > MAX_SIZE) {
+          alert(
+            `File "${file.name}" is too large. Max size is ${formatFileSize(
+              MAX_SIZE
+            )}.`
+          );
+        } else if (err.code === "too-many-files") {
+          alert(`Maximum of ${MAX_FILES} images allowed.`);
+        } else if (err.code === "file-invalid-type") {
+          alert(`File "${file.name}" is not an accepted image type.`);
+        }
+      });
     });
-  });
 
-  setImages((prevImages) => {
-    if (prevImages.length >= MAX_FILES) {
-      alert(`Already at maximum of ${MAX_FILES} images allowed.`);
-      return prevImages;
-    }
+    setImages((prevImages) => {
+      if (prevImages.length >= MAX_FILES) {
+        alert(`Already at maximum of ${MAX_FILES} images allowed.`);
+        return prevImages;
+      }
 
-    // ✅ FIX: Filter out files that are too large
-    const validFiles = acceptedFiles.filter(file => file.size <= MAX_SIZE);
-    
-    // Alert for any files that were filtered out
-    if (validFiles.length < acceptedFiles.length) {
-      alert(`Some files were too large and were not added. Max size is ${formatFileSize(MAX_SIZE)}.`);
-    }
+      // ✅ FIX: Filter out files that are too large
+      const validFiles = acceptedFiles.filter((file) => file.size <= MAX_SIZE);
 
-    const filesToAdd = validFiles.slice(0, MAX_FILES - prevImages.length);
-    const newImageFiles = filesToAdd.map((file) =>
-      Object.assign(file, {
-        preview: URL.createObjectURL(file),
-        id: `${file.name}-${file.size}-${Date.now()}` // ✅ ADD UNIQUE ID
-      })
-    );
+      // Alert for any files that were filtered out
+      if (validFiles.length < acceptedFiles.length) {
+        alert(
+          `Some files were too large and were not added. Max size is ${formatFileSize(
+            MAX_SIZE
+          )}.`
+        );
+      }
 
-    return [...prevImages, ...newImageFiles];
-  });
-}, []); // ✅ FIXED: Removed images.length dependency// ✅ FIXED: Removed images.length dependency
+      const filesToAdd = validFiles.slice(0, MAX_FILES - prevImages.length);
+      const newImageFiles = filesToAdd.map((file) =>
+        Object.assign(file, {
+          preview: URL.createObjectURL(file),
+          id: `${file.name}-${file.size}-${Date.now()}`, // ✅ ADD UNIQUE ID
+        })
+      );
+
+      return [...prevImages, ...newImageFiles];
+    });
+  }, []); // ✅ FIXED: Removed images.length dependency// ✅ FIXED: Removed images.length dependency
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -84,13 +99,13 @@ export default function ImageUploader() {
     return (e) => {
       e.preventDefault();
       e.stopPropagation(); // ✅ CRITICAL: Stop event bubbling
-      
+
       setImages((prevImages) => {
-        const imageToRemove = prevImages.find(img => img.id === imageId);
+        const imageToRemove = prevImages.find((img) => img.id === imageId);
         if (imageToRemove) {
           URL.revokeObjectURL(imageToRemove.preview);
         }
-        return prevImages.filter(img => img.id !== imageId);
+        return prevImages.filter((img) => img.id !== imageId);
       });
     };
   };
@@ -100,9 +115,9 @@ export default function ImageUploader() {
     return (e) => {
       e.preventDefault();
       e.stopPropagation(); // ✅ CRITICAL: Stop event bubbling
-      
+
       if (toIndex < 0 || toIndex >= images.length) return;
-      
+
       setImages((prevImages) => {
         const newImages = [...prevImages];
         const [movedImage] = newImages.splice(fromIndex, 1);
@@ -123,7 +138,7 @@ export default function ImageUploader() {
 
     const draggedIndex = Number(draggedIndexString);
     if (draggedIndex === targetIndex) return;
-    
+
     // ✅ FIXED: Call move function directly
     setImages((prevImages) => {
       const newImages = [...prevImages];
@@ -148,10 +163,10 @@ export default function ImageUploader() {
     if (files) {
       const fileArray = Array.from(files);
       // Create file objects with unique IDs
-      const filesWithIds = fileArray.map(file => 
+      const filesWithIds = fileArray.map((file) =>
         Object.assign(file, {
           preview: URL.createObjectURL(file),
-          id: `${file.name}-${file.size}-${Date.now()}`
+          id: `${file.name}-${file.size}-${Date.now()}`,
         })
       );
       onDrop(filesWithIds, []);
@@ -222,10 +237,16 @@ export default function ImageUploader() {
                 onDrop={(e) => handleDropImage(e, index)}
                 onDragOver={(e) => e.preventDefault()}
                 onDragEnter={(e) =>
-                  e.currentTarget.classList.add("border-indigo-400", "bg-indigo-50")
+                  e.currentTarget.classList.add(
+                    "border-indigo-400",
+                    "bg-indigo-50"
+                  )
                 }
                 onDragLeave={(e) =>
-                  e.currentTarget.classList.remove("border-indigo-400", "bg-indigo-50")
+                  e.currentTarget.classList.remove(
+                    "border-indigo-400",
+                    "bg-indigo-50"
+                  )
                 }
               >
                 <div className="relative w-20 h-20 rounded-lg overflow-hidden mr-4 flex-shrink-0 border border-gray-200">

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createRecipe, getUserRecipes } from "@/server/services/recipeservice";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/server/auth/authoptions";
+import { format } from "path";
 
 export async function GET() {
   try {
@@ -36,24 +37,31 @@ export async function POST(request) {
     const title = formData.get("title");
     const description = formData.get("description");
     const dietary = formData.get("dietary");
-    const category = formData.get("category");
+    const difficulty = formData.get("difficulty");
+    const cookTime = formData.get("cookTime");
+    const cuisineType = formData.get("cuisineType");
+    const servings = formData.get("servings");
     const ingredients = formData.get("ingredients");
     const instructions = formData.get("instructions");
 
-    const imageFile = formData.get("image"); // Blob
+    const imageFiles = formData.getAll("images"); // array of Blobs or Files
 
-    let image = null;
+    let images = [];
 
-    if (imageFile && typeof imageFile.arrayBuffer === "function") {
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
-      const base64 = buffer.toString("base64");
-      const mimeType = imageFile.type;
+    for (const [index,file] of imageFiles.entries()) {
+      if (file && typeof file.arrayBuffer === "function") {
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const base64 = buffer.toString("base64");
+        const mimeType = file.type;
 
-      image = {
-        url: `data:${mimeType};base64,${base64}`,
-        name: imageFile.name,
-        type: imageFile.type,
-      };
+        images.push({
+          url: `data:${mimeType};base64,${base64}`,
+          name: file.name,
+          type: file.type,
+          // size: file.size,
+          isCover: index === 0,
+        });
+      }
     }
 
     const recipeData = {
@@ -61,10 +69,13 @@ export async function POST(request) {
       description,
       userId: session?.user?.id,
       dietary,
-      category,
+      cuisineType,
+      difficulty,
+      cookTime,
+      servings,
       ingredients,
       instructions,
-      image,
+      images,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

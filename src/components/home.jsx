@@ -138,12 +138,21 @@ export default function Home() {
                 <span className="text-orange-600 cursor-pointer">Follow</span>
               </div>
               {/* Recipe Image */}
-              <img
-                src={recipe?.image?.url || "/images/cooking.jpg"}
-                alt={recipe.title}
-                className="w-full h-44 object-cover cursor-pointer"
-                onClick={() => router.push(`/recipedetails?id=${recipe._id}`)}
-              />
+              {recipe.images && recipe.images.length > 0 ? (
+                <img
+                  src={recipe.images.find((img) => img.isCover)?.url || "/images/cooking.jpg"}
+                  alt={recipe.title}
+                  className="w-full h-44 object-cover cursor-pointer"
+                  onClick={() => router.push(`/recipedetails?id=${recipe._id}`)}
+                />
+              ) : (
+                <img
+                  src={recipe?.image?.url || "/images/cooking.jpg"}
+                  alt={recipe.title}
+                  className="w-full h-44 object-cover cursor-pointer"
+                  onClick={() => router.push(`/recipedetails?id=${recipe._id}`)}
+                />
+              )}
 
               {/* Card Buttons */}
               <div className="flex justify-between items-center px-4 py-2 border-t border-gray-200">

@@ -1,20 +1,10 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import {
-  AddIcon,
-  MenuDownArrowIcon,
-  MenuUpArrowIcon,
-  TrashIcon,
-  UploadIcon,
-} from "./svgicons";
+import { TrashIcon } from "./svgicons";
 import ImageUploader from "./imageuploader";
+import { useRouter } from "next/navigation";
 
 export default function CreateRecipe() {
-  const [cuisineType, setcuisineType] = useState("");
-  const [difficulty, setDifficulty] = useState("");
-
-  const [servings, setServings] = useState("");
-  const [cookTime, setCookTime] = useState("");
   const options = [
     "Vegetarian",
     "Vegan",
@@ -24,12 +14,106 @@ export default function CreateRecipe() {
     "Other",
   ];
   const [selected, setSelected] = useState("");
-  const [textInputs, setTextInputs] = useState([""]);
+  const [otherType, setOtherType] = useState("");
+  const [otherCuisine, setOtherCuisine] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [cuisineType, setcuisineType] = useState("");
+  const [difficulty, setDifficulty] = useState("");
+  const [servings, setServings] = useState("");
+  const [cookTime, setCookTime] = useState("");
   const [inputs, setInputs] = useState([""]); // start with one input
+  const [textInputs, setTextInputs] = useState([""]);
+  const [images, setImages] = useState([]);
+
+  const isAddingNewInput = useRef(false);
   const inputRefs = useRef([]);
   const textInputRefs = useRef([]);
+  const router = useRouter();
   // const isFirstRender = useRef(true);
-  const isAddingNewInput = useRef(false);
+
+  // const handleImageUpload = (e) => {
+  //   let file;
+  //   for (i = 0; i < 5; i++) {
+  //     file = e.target.files[i];
+  //   }
+  //   if (file) setImage(file);
+  // };
+
+  const handlePublish = async (e) => {
+    e.preventDefault();
+
+    const cleanedIngredients = inputs
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((item) => {
+        const [measure, ...rest] = item.split(" ");
+        return { measure, name: rest.join(" ") };
+      });
+
+    const cleanedInstructions = textInputs
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    const formData = new FormData();
+
+    formData.append("title", title.trim());
+    formData.append("description", description.trim());
+    formData.append(
+      "cuisineType",
+      cuisineType.toLowerCase() === "other" ? otherCuisine : cuisineType
+    );
+    formData.append("difficulty", difficulty);
+    formData.append("cookTime", cookTime);
+    formData.append("servings", servings);
+    formData.append(
+      "dietary",
+      selected.toLowerCase() === "other" ? otherType : selected
+    );
+
+    formData.append("ingredients", JSON.stringify(cleanedIngredients));
+    formData.append("instructions", JSON.stringify(cleanedInstructions));
+
+    // ✅ Correctly append each image file
+    if (images && images.length > 0) {
+      images.forEach((file) => {
+        // If the uploader gave File objects, append them directly
+        if (file instanceof File) {
+          formData.append("images", file);
+        }
+      });
+    }
+
+    try {
+      const response = await fetch("/api/recipes", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert("Recipe Created Successfully");
+        router.push("/home");
+      } else {
+        alert("Error Creating recipe: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error in Create Page", error);
+    }
+  };
+
+  // Handle images — can be single file, multiple files, or URLs
+  // if (structImages && structImages.length > 0) {
+  //   structImages.forEach((img, index) => {
+  //     // If img is a File object (e.g. from <input type="file">)
+  //     if (img instanceof File) {
+  //       formData.append(`images`, img); // backend should handle as array
+  //     } else {
+  //       // If img is a URL or string, send it as JSON or text
+  //       formData.append(`images`, img);
+  //     }
+  //   });
+  // }
 
   const handleInputChange = (setter) => (e) => {
     const inputValue = e.target.value;
@@ -137,6 +221,8 @@ export default function CreateRecipe() {
         <h5 className="title font-medium">Recipe Title</h5>
         <input
           type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           placeholder="Name your recipe..."
           className=" focus:ring-amber-500 w-full p-2 py-2 px-3 mt-1 outline outline-black/70 focus:outline-amber-500 rounded"
         />
@@ -151,12 +237,14 @@ export default function CreateRecipe() {
             Choose Image
           </button>
         </div> */}
-        <ImageUploader />
+        <ImageUploader onChange={setImages} />
         <h5 className="image-input font-medium mt-2">Recipe Details</h5>
         <p>Description & Story</p>
         <textarea
           type="text"
           placeholder="Tell the story behind this dish."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
           className=" focus:ring-amber-500   w-full p-2  py-2 px-3 mt-1 outline outline-black/70 focus:outline-amber-500 rounded"
         ></textarea>
 
@@ -193,6 +281,8 @@ export default function CreateRecipe() {
               <input
                 id="other-cuisine"
                 type="text"
+                value={otherCuisine}
+                onChange={(e) => setOtherCuisine(e.target.value)}
                 placeholder="Enter your cuisine name"
                 className=" focus:ring-amber-500 w-full p-2  py-2 px-3 mt-1 outline outline-black/70 focus:outline-amber-500 rounded"
               />
@@ -253,6 +343,7 @@ export default function CreateRecipe() {
               <button
                 key={option}
                 type="button"
+                value={selected}
                 onClick={() => setSelected(option)}
                 className={`px-4 py-2 rounded-full border transition-all duration-200
               ${
@@ -280,8 +371,10 @@ export default function CreateRecipe() {
             <input
               id="other-preference"
               type="text"
+              value={otherType}
+              onChange={(e) => setOtherType(e.target.value)}
               placeholder="Enter your dietary type"
-              className="w-full outline outline-black/70 p-2 rounded focus:outline-amber-500 focus:ring-amber-500 "
+              className="w-full  outline outline-black/70 p-2 rounded focus:outline-amber-500 focus:ring-amber-500 "
             />
           </div>
         </div>
@@ -369,15 +462,19 @@ export default function CreateRecipe() {
           </div>
         </div>
         <div className="flex mt-2 mx-auto gap-2 w-[75%] items-center justify-end">
-
           <input
             type="button"
             value="Cancel"
+            onClick={(e) => {
+              e.preventDefault();
+              router.push("/home");
+            }}
             className="bg-stone-800 cursor-pointer p-2 rounded-full w-full text-white "
           />
           <input
             type="button"
             value="Publish"
+            onClick={(e) => handlePublish(e)}
             className="bg-amber-500 p-2 rounded-full cursor-pointer w-full text-white "
           />
         </div>
