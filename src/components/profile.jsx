@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Spinner } from "./home";
+
 import { useRouter } from "next/navigation";
 
 export default function Profile() {
@@ -43,7 +43,7 @@ export default function Profile() {
   const renderContent = () => {
     if (activeIcon === "posts") {
       if (loading) {
-        return <Spinner />;
+        return <p>Loading....</p>;
       }
       if (recipes.length === 0) {
         return <p className="text-center">No Posts</p>;

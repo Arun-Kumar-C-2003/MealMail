@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { TrashIcon } from "./svgicons";
 import ImageUploader from "./imageuploader";
 import { useRouter } from "next/navigation";
+import imageCompression from "browser-image-compression";
 
 export default function CreateRecipe() {
   const options = [
@@ -39,90 +40,114 @@ export default function CreateRecipe() {
   //   }
   //   if (file) setImage(file);
   // };
+  const compressionOptions = {
+    maxSizeMB: 0.5,
+    maxWidthOrHeight: 1080,
+    useWebWorker: true,
+  };
 
   const handlePublish = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const cleanedIngredients = inputs
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .map((item) => {
-      const [measure, ...rest] = item.split(" ");
-      return { measure, name: rest.join(" ") };
-    });
+    const cleanedIngredients = inputs
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((item) => {
+        const [measure, ...rest] = item.split(" ");
+        return { measure, name: rest.join(" ") };
+      });
 
-  const cleanedInstructions = textInputs
-    .map((item) => item.trim())
-    .filter(Boolean);
+    const cleanedInstructions = textInputs
+      .map((item) => item.trim())
+      .filter(Boolean);
 
-  const recipePayload = {
-    title: title.trim(),
-    description: description.trim(),
-    cuisineType: cuisineType.toLowerCase() === "other" ? otherCuisine : cuisineType,
-    difficulty,
-    cookTime,
-    servings,
-    dietary: selected.toLowerCase() === "other" ? otherType : selected,
-    ingredients: cleanedIngredients,
-    instructions: cleanedInstructions,
-    images: [],
-  };
+    const recipePayload = {
+      title: title.trim(),
+      description: description.trim(),
+      cuisineType:
+        cuisineType.toLowerCase() === "other" ? otherCuisine : cuisineType,
+      difficulty,
+      cookTime,
+      servings,
+      dietary: selected.toLowerCase() === "other" ? otherType : selected,
+      ingredients: cleanedIngredients,
+      instructions: cleanedInstructions,
+      images: [],
+    };
 
-  // Upload images and collect URLs
-  const uploadImage = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = async () => {
+    // Upload images and collect URLs
+    const uploadImage = async (file) => {
+      let image = file;
+      if (image.size > 1 * 1024 * 1024) {
         try {
-          const response = await fetch("/api/upload", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              file: reader.result,
-              fileName: file.name,
-            }),
-          });
-
-          const result = await response.json();
-          resolve(result.url);
+          const compressedImage = await imageCompression(
+            image,
+            compressionOptions
+          );
+          image = compressedImage;
+          // console.log(
+          //   "compressedFile instanceof Blob",
+          //   compressedImage instanceof Blob
+          // ); // true
+          // console.log(
+          //   `compressedFile size ${compressedImage.size / 1024 / 1024} MB`
+          // );
         } catch (error) {
-          reject(error);
+          console.error("Error in image compression", error);
         }
-      };
-      reader.onerror = reject;
-    });
-  };
+      }
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onloadend = async () => {
+          try {
+            const response = await fetch("/api/upload", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                file: reader.result,
+                fileName: image.name,
+              }),
+            });
 
-  try {
-    const imageUrls = await Promise.all(images.map(uploadImage));
-    recipePayload.images = imageUrls.map((url, index) => ({
-      url,
-      isCover: index === 0,
-    }));
+            const result = await response.json();
+            resolve(result.url);
+          } catch (error) {
+            reject(error);
+          }
+        };
+        reader.onerror = reject;
+      });
+    };
 
-    const response = await fetch("/api/recipes", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(recipePayload),
-    });
+    try {
+      const imageUrls = await Promise.all(images.map(uploadImage));
+      recipePayload.images = imageUrls.map((url, index) => ({
+        url,
+        isCover: index === 0,
+      }));
 
-    const result = await response.json();
-    if (response.ok) {
-      alert("Recipe Created Successfully");
-      router.push("/home");
-    } else {
-      alert("Error Creating recipe: " + result.error);
+      const response = await fetch("/api/recipes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(recipePayload),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert("Recipe Created Successfully");
+        router.push("/home");
+      } else {
+        alert("Error Creating recipe: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error in Create Page", error);
     }
-  } catch (error) {
-    console.error("Error in Create Page", error);
-  }
-};
-
+  };
 
   // Handle images — can be single file, multiple files, or URLs
   // if (structImages && structImages.length > 0) {

@@ -49,26 +49,28 @@ export default function RecipeDetailPage() {
       <div className="pt-16"></div>
       <div className="head-container m-4 sm:m-7 md:flex md:gap-6 overflow-hidden">
         {/* Main Image */}
-        <div className="main-img-container  relative w-full max-w-xl  aspect-video">
-          <img
-            src={coverImage}
-            alt="cooking image"
-            className="rounded-xl  w-full h-full object-cover"
-          />
+        <div className="main-img-container   aspect-video ">
+          <div className="relative w-full max-w-xl h-full ">
+            <img
+              src={coverImage}
+              alt="cooking image"
+              className="rounded-xl  w-full h-full object-cover"
+            />
 
-          {/* Like Button */}
-          <button className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition">
-            <LikeFilledIcon classname="fill-red-500 w-4 sm:w-5 md:w-6" />
-          </button>
+            {/* Like Button */}
+            <button className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition">
+              <LikeFilledIcon classname="fill-red-500 w-4 sm:w-5 md:w-6" />
+            </button>
 
-          {/* Labels */}
-          <div className="absolute md:top-[59%] top-[77%]   left-3 flex flex-wrap gap-2">
-            <span className="bg-black/75 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
-              {recipe?.servings} mins
-            </span>
-            <span className="bg-green-500/90 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
-              {recipe?.dietary}
-            </span>
+            {/* Labels */}
+            <div className="absolute bottom-2 left-3 flex flex-wrap gap-2">
+              <span className="bg-black/75 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
+                {recipe?.servings} mins
+              </span>
+              <span className="bg-green-500/90 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
+                {recipe?.dietary}
+              </span>
+            </div>
           </div>
           {/* Sub Images */}
           <div className="sub-images-container max-w-xl hidden  mt-3 sm:mt-4  md:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
@@ -102,7 +104,10 @@ export default function RecipeDetailPage() {
               className="w-15 h-15 object-cover rounded-full"
             />
             <span className="text-start">
-              <h5 className="text-black/75 font-medium">Chef Dan</h5>
+              <h5 className="text-black/75 font-medium">
+                {" "}
+                {recipe?.user?.username ? recipe?.user?.username : "MealMail"}
+              </h5>
               <p className="text-gray-700 text-xs md:text-sm">Foodie</p>
             </span>
             <button className="bg-amber-500 transition duration-150 ease-in hover:cursor-pointer hover:bg-amber-400 text-white p-2 w-25 h-10 rounded-full">
@@ -383,5 +388,3 @@ export default function RecipeDetailPage() {
     </>
   );
 }
-
-
