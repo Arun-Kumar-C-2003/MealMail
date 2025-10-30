@@ -45,7 +45,24 @@ class DBConnect {
       const db = await this.connect();
       const tableCollection = db.collection(collectionName);
       // const tableCollection = db.collection(tableName);
-      const find = await tableCollection.find({}).toArray();
+      const find = await tableCollection
+        .aggregate([
+          {
+            $lookup: {
+              from: "users",
+              let: { userIdObj: { $toObjectId: "$userId" } }, // convert string → ObjectId
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$userIdObj"] } } },
+                { $project: { username: 1 } },
+              ],
+              as: "user",
+            },
+          },
+          { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        ])
+        .toArray();
+
+      // console.log("This is from index.js", find);
       return find;
     } catch (error) {
       console.error("Error Getting Data", error);
@@ -68,7 +85,12 @@ class DBConnect {
     try {
       const db = await this.connect();
       const tableCollection = db.collection(collectionName);
-      const result = tableCollection.insertOne(data);
+      if (collectionName === "recipes") {
+        await tableCollection.createIndex({ userId: 1 });
+        const result = tableCollection.insertOne(data);
+        return result;
+      }
+      const result = await tableCollection.insertOne(data);
       return result;
     } catch (error) {
       console.error("Error in CreateOne:", error);
@@ -80,15 +102,39 @@ class DBConnect {
     try {
       const db = await this.connect();
       const tableCollection = db.collection(collectionName);
-      const result = tableCollection.updateOne(id, updateDate);
+      const result = await tableCollection.updateOne(id, updateDate);
       return result;
     } catch (error) {
       console.error("Error in Update:", error);
       return null;
     }
   };
+  deleteOne = async (query, collectionName) => {
+    try {
+      const db = await this.connect();
+      const tableCollection = db.collection(collectionName);
+      const result = await tableCollection.deleteOne(query);
+      return result;
+    } catch (error) {
+      console.error("Error in deleteOne:", error);
+      return null;
+    }
+  };
+
+  getUserRecipes = async (collectionName, filter = {}) => {
+    try {
+      const db = await this.connect();
+      const tableCollection = db.collection(collectionName);
+      const result = await tableCollection.find(filter).toArray();
+      return result;
+    } catch (error) {
+      console.error("Error in Getting user recipes:", error);
+      return [];
+    }
+  };
 }
 
 const dbInstance = new DBConnect();
 export default DBConnect;
+
 // export const clientPromise = dbInstance.connect().then(db => db.client);

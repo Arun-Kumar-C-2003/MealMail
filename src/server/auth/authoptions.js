@@ -1,6 +1,6 @@
 // src/server/auth/authoptions.js
 import CredentialsProvider from "next-auth/providers/credentials";
-import { loginUser } from "@/server/services/authService";
+import { loginUser } from "@/server/services/authservice";
 
 export const authOptions = {
   providers: [

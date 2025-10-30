@@ -39,7 +39,7 @@ export function TwitterIcon() {
   );
 }
 
-export const ProfileIcon = ({classname}) => {
+export const ProfileIcon = ({ classname }) => {
   return (
     <>
       <svg
@@ -53,7 +53,7 @@ export const ProfileIcon = ({classname}) => {
   );
 };
 
-export const LikeIcon = ({classname}) => {
+export const LikeIcon = ({ classname }) => {
   return (
     <>
       <svg
@@ -67,7 +67,7 @@ export const LikeIcon = ({classname}) => {
   );
 };
 
-export const AddIcon = ({classname}) => {
+export const AddIcon = ({ classname }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -79,7 +79,7 @@ export const AddIcon = ({classname}) => {
   );
 };
 
-export const NotificationIcon = ({classname}) => {
+export const NotificationIcon = ({ classname }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -91,7 +91,7 @@ export const NotificationIcon = ({classname}) => {
   );
 };
 
-export const CartIcon = ({classname}) => {
+export const CartIcon = ({ classname }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +103,7 @@ export const CartIcon = ({classname}) => {
   );
 };
 
-export const LogoutIcon = ({classname}) => {
+export const LogoutIcon = ({ classname }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -115,7 +115,7 @@ export const LogoutIcon = ({classname}) => {
   );
 };
 
-export const LikeFilledIcon = ({classname}) => {
+export const LikeFilledIcon = ({ classname }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -127,7 +127,7 @@ export const LikeFilledIcon = ({classname}) => {
   );
 };
 
-export function CommentIcon({classname}) {
+export function CommentIcon({ classname }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +139,7 @@ export function CommentIcon({classname}) {
   );
 }
 
-export function StoreIcon({classname}) {
+export function StoreIcon({ classname }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -163,7 +163,7 @@ export function ProfileRoundedIcon() {
   );
 }
 
-export function ShareIcon({classname}) {
+export function ShareIcon({ classname }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -209,6 +209,120 @@ export function HamburgerIcon() {
         strokeWidth={2}
         d="M4 6h16M4 12h16M4 18h16"
       />
+    </svg>
+  );
+}
+
+export function UploadIcon({ classname }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={classname}
+    >
+      <title>cloud-upload-outline</title>
+      <path d="M6.5 20Q4.22 20 2.61 18.43 1 16.85 1 14.58 1 12.63 2.17 11.1 3.35 9.57 5.25 9.15 5.88 6.85 7.75 5.43 9.63 4 12 4 14.93 4 16.96 6.04 19 8.07 19 11 20.73 11.2 21.86 12.5 23 13.78 23 15.5 23 17.38 21.69 18.69 20.38 20 18.5 20H13Q12.18 20 11.59 19.41 11 18.83 11 18V12.85L9.4 14.4L8 13L12 9L16 13L14.6 14.4L13 12.85V18H18.5Q19.55 18 20.27 17.27 21 16.55 21 15.5 21 14.45 20.27 13.73 19.55 13 18.5 13H17V11Q17 8.93 15.54 7.46 14.08 6 12 6 9.93 6 8.46 7.46 7 8.93 7 11H6.5Q5.05 11 4.03 12.03 3 13.05 3 14.5 3 15.95 4.03 17 5.05 18 6.5 18H9V20M12 13Z" />
+    </svg>
+  );
+}
+
+export const MenuUpArrowIcon = ({ classname }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={classname}
+    >
+      <title>menu-up</title>
+      <path d="M7,15L12,10L17,15H7Z" />
+    </svg>
+  );
+};
+
+export const MenuDownArrowIcon = ({ classname }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={classname}
+    >
+      <title>menu-down</title>
+      <path d="M7,10L12,15L17,10H7Z" />
+    </svg>
+  );
+};
+
+export const PhotoIcon = ({ classname }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={classname}
+    >
+      <title>image</title>
+      <path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z" />
+    </svg>
+  );
+};
+
+export const TrashIcon = ({ classname }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={classname}
+    >
+      <title>remove</title>
+      {/* <title>trash-can-outline</title> */}
+      <path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z" />
+    </svg>
+  );
+};
+
+export function SearchIcon({ classname }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={classname}
+    >
+      <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+    </svg>
+  );
+}
+
+export function ResetIcon({ classname }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={classname}
+    >
+      <path d="M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z" />
+    </svg>
+  );
+}
+
+export function HomeIcon({ classname }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={classname}
+    >
+      <path d="M12 5.69L17 10.19V18H15V12H9V18H7V10.19L12 5.69M12 3L2 12H5V20H11V14H13V20H19V12H22" />
+    </svg>
+  );
+}
+
+export function DeliveryIcon({ classname }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={classname}
+    >
+      <path d="M18 18.5C18.83 18.5 19.5 17.83 19.5 17C19.5 16.17 18.83 15.5 18 15.5C17.17 15.5 16.5 16.17 16.5 17C16.5 17.83 17.17 18.5 18 18.5M19.5 9.5H17V12H21.46L19.5 9.5M6 18.5C6.83 18.5 7.5 17.83 7.5 17C7.5 16.17 6.83 15.5 6 15.5C5.17 15.5 4.5 16.17 4.5 17C4.5 17.83 5.17 18.5 6 18.5M20 8L23 12V17H21C21 18.66 19.66 20 18 20C16.34 20 15 18.66 15 17H9C9 18.66 7.66 20 6 20C4.34 20 3 18.66 3 17H1V6C1 4.89 1.89 4 3 4H17V8H20M3 6V15H3.76C4.31 14.39 5.11 14 6 14C6.89 14 7.69 14.39 8.24 15H15V6H3M10 7L13.5 10.5L10 14V11.5H5V9.5H10V7Z" />
     </svg>
   );
 }

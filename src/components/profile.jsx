@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { Spinner } from "./home";
+import { useRouter } from "next/navigation";
 
 export default function Profile() {
   const [postCount, setPostCount] = useState(0);
@@ -10,6 +12,7 @@ export default function Profile() {
   const [activeIcon, setActiveIcon] = useState("posts");
   const [loading, setLoading] = useState(true);
   const [recipes, setRecipes] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     async function getRecipes() {
@@ -40,37 +43,53 @@ export default function Profile() {
   const renderContent = () => {
     if (activeIcon === "posts") {
       if (loading) {
-        return <p>Loading Recipes...</p>;
+        return <Spinner />;
       }
       if (recipes.length === 0) {
-        return <p>No Posts</p>;
+        return <p className="text-center">No Posts</p>;
       }
       return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {recipes.map((recipe, index) => (
-            <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md flex flex-col">
-              {recipe.image && recipe.image.url ? (
+            <div
+              key={index}
+              className="bg-white rounded-lg cursor-pointer hover:-translate-y-1 transition-transform duration-300 ease-in-out overflow-hidden shadow-md flex flex-col"
+            >
+              <img
+                src={recipe?.image?.url ?? "/images/cooking.jpg"}
+                alt={recipe.title}
+                className="w-full h-48 object-cover"
+                onClick={() => router.push(`/recipedetails?id=${recipe._id}`)}
+              />
+              {/* {recipe.image && recipe.image.url ? (
                 <img
                   src={recipe.image.url}
                   alt={recipe.title}
                   className="w-full h-48 object-cover"
                 />
               ) : (
-                <div className="flex items-center justify-center h-48 bg-gray-100">
-                  <p className="text-gray-500">No image available</p>
-                </div>
-              )}
+                <img
+                  src="/images/cooking.jpg"
+                  alt={recipe.title}
+                  className="w-full h-48 object-cover"
+                />
+              )} */}
+              {/* <div className="flex items-center justify-center h-48 bg-gray-100">
+                  <p className="text-gray-500 text-center">No image available</p>
+                </div> */}
               <div className="p-4 flex-1">
-                <p className="font-semibold text-lg">{recipe.title}</p>
+                <p className="font-semibold text-lg text-center">
+                  {recipe.title}
+                </p>
               </div>
             </div>
           ))}
         </div>
       );
     } else if (activeIcon === "orders") {
-      return <p>No orders</p>;
+      return <p className="text-center">No orders</p>;
     } else if (activeIcon === "drafts") {
-      return <p>No drafts</p>;
+      return <p className="text-center">No drafts</p>;
     }
   };
 
@@ -82,7 +101,7 @@ export default function Profile() {
   return (
     <div className="px-4 py-8 max-w-4xl mx-auto">
       {/* Profile header */}
-      <div className="flex flex-col md:flex-row items-center md:items-start space-x-0 md:space-x-6 mb-8">
+      <div className="flex flex-col md:flex-row items-center justify-center md:items-start space-x-0 md:space-x-6 mb-8">
         <div>
           <img
             src="/images/cooking.jpg"
@@ -91,11 +110,9 @@ export default function Profile() {
           />
         </div>
         <div className="mt-4 md:mt-0 text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start space-x-3">
-            <span className="text-xl font-semibold">
-              {session?.user?.name || "Guest"}
-            </span>
-            <button className="px-3 py-1 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition">
+          <div className="flex items-center justify-center gap-2 ms-2 md:justify-start space-x-3">
+            <span className="text-xl">{session?.user?.name || "Guest"}</span>
+            <button className="px-3 py-1  bg-gray-800 text-white rounded hover:bg-gray-700 transition">
               Edit Profile
             </button>
           </div>
@@ -122,13 +139,15 @@ export default function Profile() {
       </div>
 
       {/* Icons navigation */}
-      <div className="flex justify-center space-x-10 mb-6">
+      <div className="flex justify-center space-x-16 mb-6">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="30"
           viewBox="0 -960 960 960"
           width="30"
-          className={`cursor-pointer ${activeIcon === "posts" ? "text-blue-600" : "text-gray-400"}`}
+          className={`cursor-pointer ${
+            activeIcon === "posts" ? "fill-orange-600" : "fill-gray-900"
+          }`}
           onClick={() => setActiveIcon("posts")}
           title="Posts"
         >
@@ -140,7 +159,9 @@ export default function Profile() {
           height="30"
           viewBox="0 -960 960 960"
           width="30"
-          className={`cursor-pointer ${activeIcon === "orders" ? "text-blue-600" : "text-gray-400"}`}
+          className={`cursor-pointer ${
+            activeIcon === "orders" ? "fill-orange-600" : "fill-gray-900"
+          }`}
           onClick={() => setActiveIcon("orders")}
           title="Order History"
         >
@@ -152,7 +173,9 @@ export default function Profile() {
           height="30"
           viewBox="0 -960 960 960"
           width="30"
-          className={`cursor-pointer ${activeIcon === "drafts" ? "text-blue-600" : "text-gray-400"}`}
+          className={`cursor-pointer ${
+            activeIcon === "drafts" ? "fill-orange-600" : "fill-gray-900"
+          }`}
           onClick={() => setActiveIcon("drafts")}
           title="Drafts"
         >
