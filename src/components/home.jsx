@@ -15,6 +15,7 @@ import NavBar from "./navbar";
 // import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Spinner } from "./loaders";
 
 export default function Home() {
   const randomBG = [
@@ -44,6 +45,7 @@ export default function Home() {
   const [followState, setFollowState] = useState(false);
   const [userRecipes, setUserRecipes] = useState([]);
   const [totalRecipes, setTotalRecipes] = useState(0);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   const time = "20";
@@ -66,6 +68,8 @@ export default function Home() {
         console.error("Error in Home page getting user recipes:", error);
         setUserRecipes([]);
         setTotalRecipes(0);
+      } finally {
+        setLoading(false);
       }
     }
     getAllUserRecipes();
@@ -146,7 +150,7 @@ export default function Home() {
             <ResetIcon classname={`w-5 h-5 aspect-square fill-white `} />
           </div> */}
         <hr className="border-t border-gray-300" />
-
+        {loading?<Spinner/>:""}
         <div className="bg-gray-100 p-3 md:px-8 mb-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 ">
           {userRecipes.slice(0, totalRecipes).map((recipe, index) => {
             const randomBGClass = randomBG[index % randomBG.length];

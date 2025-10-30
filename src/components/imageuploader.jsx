@@ -83,7 +83,7 @@ export default function ImageUploader({ onChange }) {
 
       return [...prevImages, ...newImageFiles];
     });
-  }, []); // ✅ FIXED: Removed images.length dependency// ✅ FIXED: Removed images.length dependency
+  }, []); // ✅ FIXED: Removed images.length dependency
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,

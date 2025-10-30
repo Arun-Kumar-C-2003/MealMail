@@ -41,66 +41,88 @@ export default function CreateRecipe() {
   // };
 
   const handlePublish = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const cleanedIngredients = inputs
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .map((item) => {
-        const [measure, ...rest] = item.split(" ");
-        return { measure, name: rest.join(" ") };
-      });
+  const cleanedIngredients = inputs
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((item) => {
+      const [measure, ...rest] = item.split(" ");
+      return { measure, name: rest.join(" ") };
+    });
 
-    const cleanedInstructions = textInputs
-      .map((item) => item.trim())
-      .filter(Boolean);
+  const cleanedInstructions = textInputs
+    .map((item) => item.trim())
+    .filter(Boolean);
 
-    const formData = new FormData();
-
-    formData.append("title", title.trim());
-    formData.append("description", description.trim());
-    formData.append(
-      "cuisineType",
-      cuisineType.toLowerCase() === "other" ? otherCuisine : cuisineType
-    );
-    formData.append("difficulty", difficulty);
-    formData.append("cookTime", cookTime);
-    formData.append("servings", servings);
-    formData.append(
-      "dietary",
-      selected.toLowerCase() === "other" ? otherType : selected
-    );
-
-    formData.append("ingredients", JSON.stringify(cleanedIngredients));
-    formData.append("instructions", JSON.stringify(cleanedInstructions));
-
-    // ✅ Correctly append each image file
-    if (images && images.length > 0) {
-      images.forEach((file) => {
-        // If the uploader gave File objects, append them directly
-        if (file instanceof File) {
-          formData.append("images", file);
-        }
-      });
-    }
-
-    try {
-      const response = await fetch("/api/recipes", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        alert("Recipe Created Successfully");
-        router.push("/home");
-      } else {
-        alert("Error Creating recipe: " + result.error);
-      }
-    } catch (error) {
-      console.error("Error in Create Page", error);
-    }
+  const recipePayload = {
+    title: title.trim(),
+    description: description.trim(),
+    cuisineType: cuisineType.toLowerCase() === "other" ? otherCuisine : cuisineType,
+    difficulty,
+    cookTime,
+    servings,
+    dietary: selected.toLowerCase() === "other" ? otherType : selected,
+    ingredients: cleanedIngredients,
+    instructions: cleanedInstructions,
+    images: [],
   };
+
+  // Upload images and collect URLs
+  const uploadImage = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = async () => {
+        try {
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              file: reader.result,
+              fileName: file.name,
+            }),
+          });
+
+          const result = await response.json();
+          resolve(result.url);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = reject;
+    });
+  };
+
+  try {
+    const imageUrls = await Promise.all(images.map(uploadImage));
+    recipePayload.images = imageUrls.map((url, index) => ({
+      url,
+      isCover: index === 0,
+    }));
+
+    const response = await fetch("/api/recipes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(recipePayload),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert("Recipe Created Successfully");
+      router.push("/home");
+    } else {
+      alert("Error Creating recipe: " + result.error);
+    }
+  } catch (error) {
+    console.error("Error in Create Page", error);
+  }
+};
+
 
   // Handle images — can be single file, multiple files, or URLs
   // if (structImages && structImages.length > 0) {
