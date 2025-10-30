@@ -492,13 +492,13 @@ export default function CreateRecipe() {
               e.preventDefault();
               router.back();
             }}
-            className="bg-stone-800 cursor-pointer p-2 rounded-full w-full text-white "
+            className="bg-stone-800 drop-shadow-md cursor-pointer p-2 rounded-full w-full text-white "
           />
           <input
             type="button"
             value="Publish"
             onClick={(e) => handlePublish(e)}
-            className="bg-amber-500 p-2 rounded-full cursor-pointer w-full text-white "
+            className="bg-amber-500 drop-shadow-md p-2 rounded-full cursor-pointer w-full text-white "
           />
         </div>
         {/* <input type="number" name="value" id="value" min={1} className=" outline-2 focus:outline-black" /> */}
