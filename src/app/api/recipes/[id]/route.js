@@ -15,7 +15,7 @@ export async function GET(request, { params }) {
         { status: 400 }
       );
     }
-
+    console.log("This is the GET method in route.js[id]");
     const recipe = await getRecipeById(id);
 
     if (!recipe) {

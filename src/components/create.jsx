@@ -23,7 +23,7 @@ export default function CreateRecipe() {
   const [difficulty, setDifficulty] = useState("");
   const [servings, setServings] = useState("");
   const [cookTime, setCookTime] = useState("");
-  const [inputs, setInputs] = useState([""]); // start with one input
+  const [inputs, setInputs] = useState([""]);
   const [textInputs, setTextInputs] = useState([""]);
   const [images, setImages] = useState([]);
 
@@ -78,7 +78,7 @@ export default function CreateRecipe() {
     // Upload images and collect URLs
     const uploadImage = async (file) => {
       let image = file;
-      if (image.size > 1 * 1024 * 1024) {
+      if (image.size > 0.5 * 1024 * 1024) {
         try {
           const compressedImage = await imageCompression(
             image,
@@ -509,7 +509,7 @@ export default function CreateRecipe() {
             </button>
           </div>
         </div>
-        <div className="flex mt-2 mx-auto gap-2 w-[75%] items-center justify-end">
+        <div className="flex mb-10 md:mb-0 mt-2 mx-auto gap-2 w-[75%] items-center justify-end">
           <input
             type="button"
             value="Cancel"
