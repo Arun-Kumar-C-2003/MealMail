@@ -54,6 +54,7 @@ export async function getRecipeById(id) {
     }
 
     const recipe = await db.getOne({ _id: new ObjectId(id) }, collectionName);
+    console.log("This is the GetRecipeById service")
     return recipe;
   } catch (error) {
     console.error("Error in getRecipeById:", error);

@@ -41,11 +41,11 @@ export default function NavBar() {
   return (
     <>
       <header className="bg-white fixed z-50 top-0 shadow w-full">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3 relative">
+        <nav className="max-w-full mx-auto flex items-center justify-between px-5 md:px-8 py-3 relative">
           <Link
             href="/home"
             aria-disabled={isLogoActive}
-            className="text-2xl font-bold text-white bg-amber-500 p-2 rounded-md hover:bg-amber-400 transition-colors duration-150 ease-in "
+            className="text-2xl font-bold hover:scale-105 text-white bg-amber-500 p-2 rounded-md hover:bg-amber-400 transition duration-150 ease-in "
           >
             MealMail
           </Link>

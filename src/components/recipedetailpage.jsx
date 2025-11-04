@@ -16,7 +16,11 @@ export default function RecipeDetailPage() {
         const response = await fetch(`/api/recipes/${id}`);
         const data = await response.json();
         if (data) {
-          setRecipe(Array.isArray(data) ? data[0] : data);
+          if (Array.isArray(data) && data.length > 0) {
+            setRecipe(data[0]);
+          } else {
+            setRecipe(data);
+          }
         }
       } catch (error) {
         console.error("Error in Recipedetailpage useeffect", error);
@@ -49,26 +53,28 @@ export default function RecipeDetailPage() {
       <div className="pt-16"></div>
       <div className="head-container m-4 sm:m-7 md:flex md:gap-6 overflow-hidden">
         {/* Main Image */}
-        <div className="main-img-container  relative w-full max-w-xl  aspect-video">
-          <img
-            src={coverImage}
-            alt="cooking image"
-            className="rounded-xl  w-full h-full object-cover"
-          />
+        <div className="main-img-container   aspect-video ">
+          <div className="relative w-full max-w-xl h-full ">
+            <img
+              src={coverImage}
+              alt="cooking image"
+              className="rounded-xl  w-full h-full object-cover"
+            />
 
-          {/* Like Button */}
-          <button className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition">
-            <LikeFilledIcon classname="fill-red-500 w-4 sm:w-5 md:w-6" />
-          </button>
+            {/* Like Button */}
+            <button className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition">
+              <LikeFilledIcon classname="fill-red-500 w-4 sm:w-5 md:w-6" />
+            </button>
 
-          {/* Labels */}
-          <div className="absolute md:top-[59%] top-[77%]   left-3 flex flex-wrap gap-2">
-            <span className="bg-black/75 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
-              {recipe?.servings} mins
-            </span>
-            <span className="bg-green-500/90 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
-              {recipe?.dietary}
-            </span>
+            {/* Labels */}
+            <div className="absolute bottom-2 left-3 flex flex-wrap gap-2">
+              <span className="bg-black/75 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
+                {recipe?.servings} mins
+              </span>
+              <span className="bg-green-500/90 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
+                {recipe?.dietary}
+              </span>
+            </div>
           </div>
           {/* Sub Images */}
           <div className="sub-images-container max-w-xl hidden  mt-3 sm:mt-4  md:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
@@ -102,7 +108,10 @@ export default function RecipeDetailPage() {
               className="w-15 h-15 object-cover rounded-full"
             />
             <span className="text-start">
-              <h5 className="text-black/75 font-medium">Chef Dan</h5>
+              <h5 className="text-black/75 font-medium">
+                {" "}
+                {recipe?.user?.username ? recipe?.user?.username : "MealMail"}
+              </h5>
               <p className="text-gray-700 text-xs md:text-sm">Foodie</p>
             </span>
             <button className="bg-amber-500 transition duration-150 ease-in hover:cursor-pointer hover:bg-amber-400 text-white p-2 w-25 h-10 rounded-full">
@@ -127,7 +136,7 @@ export default function RecipeDetailPage() {
 
           <div className="price-order flex justify-between md:justify-normal md:gap-5 md:mt-7 mt-2">
             <span className="price text-center  bg-black/80 text-white py-2 px-3  rounded-full">
-              Rs.189
+                &#8377;189  
             </span>
             <button className="bg-amber-500 py-2 px-3 gap-2 hover:bg-amber-400 transition duration-150 ease-in cursor-pointer  text-white flex rounded-full">
               <CartIcon classname="fill-white w-4 sm:w-5 md:w-4" />
@@ -142,7 +151,7 @@ export default function RecipeDetailPage() {
 
       <div className="main-container pt-5 px-3 md:p-6 pb-10 md:flex md:gap-5 gap-0 bg-gray-50">
         <div>
-          <div className="ingredients bg-white rounded-xl p-5 ">
+          <div className="ingredients bg-white rounded-xl md:p-7 mt-5 px-3 pt-5">
             <div className="flex justify-between">
               <h3 className="font-medium text-xl">Ingredients</h3>
               <span className="flex gap-2  text-gray-600 ">
@@ -152,18 +161,39 @@ export default function RecipeDetailPage() {
                 </p>
               </span>
             </div>
-            <p className="mt-3 text-gray-700 text-justify">
+            {/* <p className="mt-3 text-gray-700 text-justify">
               500 g (about 1 lb) boneless chicken thighs or breasts, cut into
               chunks 1 cup plain yogurt (Greek or regular) 2 tbsp lemon juice 2
               tbsp ginger-garlic paste (or 1 tbsp each minced ginger and garlic)
               2 tsp garam masala 1 tsp cumin powder 1 tsp coriander powder 1 tsp
               turmeric 1–2 tsp red chili powder (adjust for spice level) Salt to
               taste 2 tbsp oil (optional, for tenderness)
-            </p>
+            </p> */}
+            {recipe?.ingredients?.map((item, index) => (
+              <div
+                className="mt-3 text-gray-700 flex space-x-1 text-justify"
+                key={index}
+              >
+                <input
+                  type="checkbox"
+                  name="recipecheckbox"
+                  id="recipe_check_box"
+                  className=" mr-2 w-5 aspect-square accent-amber-400 outline-0 border-2"
+                />
+                <span className="font-medium">{item.measure}</span>{" "}
+                <span>{item.name}</span>
+              </div>
+            ))}
           </div>
-          <div className="bg-white text-justify md:p-7 mt-5 px-3 pt-5  rounded-xl">
+          <div
+            className={`bg-white text-justify md:p-7 mt-5 px-3 pt-5 rounded-xl ${
+              recipe?.instructions?.length < 3
+                ? "min-h-[50vh] min-w-[45vw] lg:min-w-[60vw]"
+                : ""
+            }`}
+          >
             <h3 className="font-medium text-xl">Instructions</h3>
-            <p className="text-gray-700 mt-2 ">
+            {/* <p className="text-gray-700 mt-2 ">
               Step 1: Marinate the ChickenIn a large bowl, mix together:Yogurt,
               lemon juice, ginger-garlic paste, garam masala, cumin, coriander,
               turmeric, red chili powder, salt, and oil (if using).Add the
@@ -191,7 +221,18 @@ export default function RecipeDetailPage() {
               and ServeAdd a small knob of butter for extra richness.Garnish
               with fresh cilantro and a squeeze of lemon juice.Serve hot with
               naan, roti, or steamed basmati rice.
-            </p>
+            </p> */}
+            {recipe?.instructions?.map((item, index) => (
+              <div
+                key={index}
+                className="border p-2 mt-2 flex items-baseline gap-x-2 w-full rounded-md  border-gray-300"
+              >
+                <span className="bg-amber-500 p-1 w-8 flex items-center justify-center text-white aspect-square rounded-full">
+                  {index + 1}
+                </span>
+                <p className="text-gray-800 mt-2 ">{item}</p>
+              </div>
+            ))}
           </div>
           {/* Review Box */}
           <div className="pt-5 px-3 md:p-6 pb-6 bg-white mt-3  rounded-xl">
@@ -383,5 +424,3 @@ export default function RecipeDetailPage() {
     </>
   );
 }
-
-

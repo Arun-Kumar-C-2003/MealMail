@@ -16,6 +16,8 @@ import NavBar from "./navbar";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./loaders";
+// import Dialog from "./modal";
+import Modal from "./modal";
 
 export default function Home() {
   const randomBG = [
@@ -46,6 +48,8 @@ export default function Home() {
   const [userRecipes, setUserRecipes] = useState([]);
   const [totalRecipes, setTotalRecipes] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setOpen] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
   const router = useRouter();
 
   const time = "20";
@@ -80,7 +84,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="pt-16 ">
-        <div className="p-4 md:p-10 flex items-center justify-between">
+        <div className="p-4 md:p-8 flex items-center justify-between">
           <div>
             <h1 className="text-4xl text-black/90 font-bold ">
               Discover Recipes
@@ -150,7 +154,7 @@ export default function Home() {
             <ResetIcon classname={`w-5 h-5 aspect-square fill-white `} />
           </div> */}
         <hr className="border-t border-gray-300" />
-        {loading?<Spinner/>:""}
+        {loading ? <Spinner /> : ""}
         <div className="bg-gray-100 p-3 md:px-8 mb-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 ">
           {userRecipes.slice(0, totalRecipes).map((recipe, index) => {
             const randomBGClass = randomBG[index % randomBG.length];
@@ -241,7 +245,13 @@ export default function Home() {
 
                 {/* Order & Share button only,Like at top */}
                 <div className="w-full flex justify-start gap-1 p-2">
-                  <button className="w-[55%] cursor-pointer flex gap-1 relative overflow-hidden items-center text-amber-500 justify-center border border-amber-500 rounded-full p-1 group">
+                  <button
+                    className="w-[55%] cursor-pointer flex gap-1 relative overflow-hidden items-center text-amber-500 justify-center border border-amber-500 rounded-full p-1 group"
+                    onClick={() => {
+                      setOpen(true);
+                      setSelectedRecipe(recipe);
+                    }}
+                  >
                     <span className="absolute inset-0 bg-amber-500 transform -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0"></span>
                     <span className="relative z-10 flex items-center gap-1 transition-colors duration-300 group-hover:text-white">
                       <CartIcon classname="group-hover:fill-white fill-amber-500 w-4 h-4" />
@@ -263,6 +273,9 @@ export default function Home() {
             );
           })}
         </div>
+        {isOpen && (
+          <Modal recipe={selectedRecipe} open={isOpen} setOpen={setOpen} />
+        )}
       </div>
     </>
   );
