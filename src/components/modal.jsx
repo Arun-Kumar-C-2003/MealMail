@@ -78,6 +78,7 @@ export default function Modal({ recipe, open, setOpen }) {
               alt={recipe?.title || "Recipe"}
               className="w-full h-full object-cover"
             />
+            {/* <p className="absolute bottom-2 py-1 px-2 rounded-xl bg-blue-500/90 right-2 text-white">50% off</p> */}
           </div>
 
           {/* Content */}
