@@ -3,6 +3,7 @@ import { CartIcon, LikeFilledIcon, ShareIcon } from "@/components/svgicons";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Spinner } from "./loaders";
+import Modal from "./modal";
 
 export default function RecipeDetailPage() {
   const searchParams = useSearchParams();
@@ -10,6 +11,9 @@ export default function RecipeDetailPage() {
   const [recipe, setRecipe] = useState(null);
   // const [loading, setLoading] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [isOpen, setOpen] = useState(false);
+
   useEffect(() => {
     async function fetchRecipeData() {
       try {
@@ -136,9 +140,15 @@ export default function RecipeDetailPage() {
 
           <div className="price-order flex justify-between md:justify-normal md:gap-5 md:mt-7 mt-2">
             <span className="price text-center  bg-black/80 text-white py-2 px-3  rounded-full">
-                &#8377;189  
+              &#8377;189
             </span>
-            <button className="bg-amber-500 py-2 px-3 gap-2 hover:bg-amber-400 transition duration-150 ease-in cursor-pointer  text-white flex rounded-full">
+            <button
+              className="bg-amber-500 py-2 px-3 gap-2 hover:bg-amber-400 transition duration-150 ease-in cursor-pointer  text-white flex rounded-full"
+              onClick={() => {
+                setOpen(true);
+                setSelectedRecipe(recipe);
+              }}
+            >
               <CartIcon classname="fill-white w-4 sm:w-5 md:w-4" />
               Order Now
             </button>
@@ -151,7 +161,7 @@ export default function RecipeDetailPage() {
 
       <div className="main-container pt-5 px-3 md:p-6 pb-10 md:flex md:gap-5 gap-0 bg-gray-50">
         <div>
-          <div className="ingredients bg-white rounded-xl md:p-7 mt-5 px-3 pt-5">
+          <div className="ingredients bg-white rounded-xl md:p-7  px-3 pt-5">
             <div className="flex justify-between">
               <h3 className="font-medium text-xl">Ingredients</h3>
               <span className="flex gap-2  text-gray-600 ">
@@ -393,7 +403,7 @@ export default function RecipeDetailPage() {
           </div>
           <div className="bg-white rounded-xl py-5 mt-5   px-5">
             <h5 className="font-bold mb-3 flex text-xl">Related Recipes</h5>
-            <div className=" relative rounded-xl shadow-lg bg-gray-50 hover:scale-105 transition-transform duration-150 ease-in-out">
+            <div className=" relative rounded-xl shadow-lg bg-gray-50 hover:scale-95 transition-transform duration-300 ease-in-out">
               <img
                 src="/images/carouselimg1.jpg"
                 alt="chef"
@@ -421,6 +431,9 @@ export default function RecipeDetailPage() {
           </div>
         </div>
       </div>
+      {isOpen && (
+        <Modal recipe={selectedRecipe} open={isOpen} setOpen={setOpen} />
+      )}
     </>
   );
 }
