@@ -1,17 +1,8 @@
 "use client";
 import Link from "next/link";
-import {
-  HomeIcon,
-  AddIcon,
-  LikeFilledIcon,
-  CartIcon,
-  ProfileIcon,
-  SearchIcon,
-  StoreIcon,
-  DeliveryIcon,
-} from "./svgicons";
-
+import {HomeIcon,AddIcon, LikeFilledIcon, CartIcon, ProfileIcon,SearchIcon,StoreIcon,DeliveryIcon,HamburgerIcon,} from "./svgicons";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function NavBar() {
   const navLinks = [
@@ -31,8 +22,8 @@ export default function NavBar() {
   const isLogoActive = pathname === navLinks[0].linkTo;
   // const isActive = navLinks.some((link) => pathname === `/${link.linkTo}`);
 
+  const router = useRouter();
   const navigator = (href) => {
-    const router = useRouter();
     if (router.pathname !== href) {
       router.push(href);
     }
@@ -96,10 +87,16 @@ export default function NavBar() {
             </button>
 
             {/* Profile Icon => User Profile Appears Instead of Icon */}
-            <button title="profile">
-              <ProfileIcon
-                classname={`w-6 h-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer fill-gray-700`}
-              />
+            <button title="profile" onClick={() => router.push("/profile")}>
+              {pathname === "/profile" ? (
+                <HamburgerIcon
+                  classname={`w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700`}
+                />
+              ) : (
+                <ProfileIcon
+                  classname={`w-6 h-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer fill-gray-700`}
+                />
+              )}
             </button>
           </div>
         </nav>
@@ -117,10 +114,8 @@ export default function NavBar() {
                 href={href}
                 // href={`/${link.linkTo == "home" ? "home" : link.linkTo}`}
                 aria-disabled={isActive}
-                className={`${
-                  isActive ? "bg-amber-500 rounded-md" : ""
-                }  fill-gray-200 w-7 h-7  transition-colors duration-300 p-1 ease-in-out`}
-              >
+                className={`${isActive ? "bg-amber-500 rounded-md" : ""
+                }  fill-gray-200 w-7 h-7  transition-colors duration-300 p-1 ease-in-out`}>
                 {/* {link.charAt(0).toUpperCase() + link.slice(1)} */}
                 <item.icon />
               </Link>
