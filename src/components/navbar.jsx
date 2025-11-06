@@ -1,8 +1,22 @@
 "use client";
 import Link from "next/link";
-import {HomeIcon,AddIcon, LikeFilledIcon, CartIcon, ProfileIcon,SearchIcon,StoreIcon,DeliveryIcon,HamburgerIcon,} from "./svgicons";
+import {
+  HomeIcon,
+  AddIcon,
+  LikeFilledIcon,
+  CartIcon,
+  ProfileIcon,
+  SearchIcon,
+  StoreIcon,
+  DeliveryIcon,
+  HamburgerIcon,
+} from "./svgicons";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { MdOutlineCollectionsBookmark } from "react-icons/md";
+import { MdOutlineMenuBook } from "react-icons/md";
+import { RiLogoutCircleRLine } from "react-icons/ri";
+import { MdBorderColor } from "react-icons/md";
 
 export default function NavBar() {
   const navLinks = [
@@ -20,7 +34,6 @@ export default function NavBar() {
   ];
   const pathname = usePathname();
   const isLogoActive = pathname === navLinks[0].linkTo;
-  // const isActive = navLinks.some((link) => pathname === `/${link.linkTo}`);
 
   const router = useRouter();
   const navigator = (href) => {
@@ -29,8 +42,16 @@ export default function NavBar() {
     }
   };
 
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOutside = () => setOpen(false);
+    // window.addEventListener("click", handleOutside);
+    // return () => window.removeEventListener("click", handleOutside);
+  }, []);
+
   return (
-    <>
+    <div>
       <header className="bg-white fixed z-50 top-0 shadow w-full">
         <nav className="max-w-full mx-auto flex items-center justify-between px-5 md:px-8 py-3 relative">
           <Link
@@ -85,24 +106,48 @@ export default function NavBar() {
                 classname={`w-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer h-6 fill-gray-700`}
               />
             </button>
-
-            {/* Profile Icon => User Profile Appears Instead of Icon */}
-            <button title="profile" onClick={() => router.push("/profile")}>
+            <div className=""
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen((prev) => !prev);
+              }}>
+                
               {pathname === "/profile" ? (
-                <HamburgerIcon
-                  classname={`w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700`}
-                />
+                <HamburgerIcon classname="w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700" />
               ) : (
-                <ProfileIcon
-                  classname={`w-6 h-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer fill-gray-700`}
-                />
+                <ProfileIcon classname="w-6 h-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer fill-gray-700" />
               )}
-            </button>
+
+             {open && pathname === "/profile" && (
+  <div className="absolute right-0 mt-3 w-52  h-120 bg-white shadow-lg rounded-xl z-50 p-2">
+    <button className="flex items-center gap-3 w-full text-left px-3 py-2 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
+      <MdOutlineMenuBook className="text-xl" />
+      <span>Menu</span>
+    </button>
+
+    <button className="flex items-center gap-3 w-full text-left px-3 py-2 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
+      <MdOutlineCollectionsBookmark className="text-xl" />
+      <span>Collection</span>
+    </button>
+
+    <button className="flex items-center gap-3 w-full text-left px-3 py-2 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
+      <MdBorderColor className="text-xl" />
+      <span>Order</span>
+    </button>
+
+    <div className="border-t my-2" />
+
+    <button className="flex items-center gap-3 w-full text-left px-3 py-2 text-gray-700 rounded-md hover:bg-red-50 hover:text-red-500 transition">
+      <RiLogoutCircleRLine className="text-xl" />
+      <span>Logout</span>
+    </button>
+  </div>
+)}
+
+            </div>
           </div>
         </nav>
       </header>
-
-      {/* Bottom Navigation for mobile devices */}
       <footer className="md:hidden flex w-full fixed z-50 bottom-0 bg-gray-800 py-2 px-10 rounded-t-md">
         <div className="w-full text-white flex justify-between">
           {iconsPath.map((item, index) => {
@@ -112,38 +157,16 @@ export default function NavBar() {
               <Link
                 key={`${item.link + index}`}
                 href={href}
-                // href={`/${link.linkTo == "home" ? "home" : link.linkTo}`}
                 aria-disabled={isActive}
-                className={`${isActive ? "bg-amber-500 rounded-md" : ""
+                className={`${
+                  isActive ? "bg-amber-500 rounded-md" : ""
                 }  fill-gray-200 w-7 h-7  transition-colors duration-300 p-1 ease-in-out`}>
-                {/* {link.charAt(0).toUpperCase() + link.slice(1)} */}
                 <item.icon />
               </Link>
             );
           })}
         </div>
       </footer>
-    </>
+    </div>
   );
-}
-
-{
-  /* <div className="w-full text-white flex justify-between">
-  <button>
-    <HomeIcon classname={`fill-gray-200 w-5 h-5`} />
-  </button>
-  <button>
-    <SearchIcon classname={`fill-gray-200 w-5 h-5`} />
-  </button>
-  <button>
-    <AddIcon classname={`fill-gray-200 w-5 h-5`} />
-  </button>
-  <button>
-    <StoreIcon classname={`fill-gray-200 w-5 h-5`} />
-  </button>
-</div>; */
-}
-
-{
-  /* <DeliveryIcon classname={`fill-gray-200 w-5 h-5`} /> */
 }
