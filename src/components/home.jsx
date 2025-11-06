@@ -214,7 +214,7 @@ export default function Home() {
                   <h5 className="font-medium text-xl text-black/90">
                     {recipe.title}
                   </h5>
-                  <p className="text-gray-700">{recipe.description}</p>
+                  <p className="text-gray-700 text-sm mt-1 mb-1">{recipe.description}</p>
                 </div>
 
                 <div className="px-3 pb-2 flex justify-between items-center">
