@@ -1,8 +1,8 @@
 import {
   updateRecipe,
-  getRecipeById,
   deleteRecipe,
-} from "@/server/services/recipeservice";
+  getRecipeById,
+} from "@/server/services/recipeService";
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {

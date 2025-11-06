@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { ConnectBtns } from "@/components/welcome";
+import Link from "next/link";
 
 export default function Login() {
   const router = useRouter();
@@ -108,9 +109,9 @@ export default function Login() {
           )}
 
           <div className="text-center">
-            <a href="/signup" className="text-sm text-neutral-700 hover:underline">
+            <Link href="/signup" className="text-sm text-neutral-700 hover:underline">
               New to MealMail? Sign Up
-            </a>
+            </Link>
           </div>
         </form>
 

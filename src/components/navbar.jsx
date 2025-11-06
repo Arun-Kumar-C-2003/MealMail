@@ -25,6 +25,7 @@ export default function NavBar() {
     { icon: HomeIcon, link: "home" },
     { icon: SearchIcon, link: "search" },
     { icon: AddIcon, link: "addrecipe" },
+    { icon: DeliveryIcon, link: "orders" },
     { icon: StoreIcon, link: "stores" },
   ];
   const pathname = usePathname();

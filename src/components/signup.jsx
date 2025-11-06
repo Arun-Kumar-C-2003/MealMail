@@ -4,14 +4,15 @@ import { ConnectBtns, TermsPolicyPara } from "@/components/welcome";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 export const LoginAcct = () => (
-  <a
+  <Link
     className="text-sm text-neutral-700 hover:underline self-end"
     href="/login"
   >
     Already have an account? Sign In
-  </a>
+  </Link>
 );
 
 export default function SignUp() {
