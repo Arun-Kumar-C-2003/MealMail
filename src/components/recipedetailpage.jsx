@@ -3,13 +3,20 @@ import { CartIcon, LikeFilledIcon, ShareIcon } from "@/components/svgicons";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Spinner } from "./loaders";
+import Modal from "./modal";
+import Slider from "react-slick";
+import Image from "next/image";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function RecipeDetailPage() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const [recipe, setRecipe] = useState(null);
-  // const [loading, setLoading] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [isOpen, setOpen] = useState(false);
+
   useEffect(() => {
     async function fetchRecipeData() {
       try {
@@ -31,15 +38,11 @@ export default function RecipeDetailPage() {
     if (id) fetchRecipeData();
   }, [id]);
 
-  // const images = [
-  //   "/images/cooking.jpg",
-  //   "/images/cooking.jpg",
-  //   "/images/cooking.jpg",
-  //   "/images/cooking.jpg",
-  // ];
   const imgs = recipe?.images || [];
+  const images = imgs.filter((i) => i?.url).map((i) => i.url);
+  // const imgs = recipe?.images || [];
+  // const images = imgs.filter((i) => !i?.isCover && i?.url).map((i) => i.url);
   const coverImage = imgs[0]?.url;
-  const images = imgs.filter((i) => !i?.isCover && i?.url).map((i) => i.url);
 
   if (loading) return <Spinner />;
   if (!recipe)
@@ -48,56 +51,100 @@ export default function RecipeDetailPage() {
   const ingredients = recipe.ingredients
     ? recipe.ingredients.map((item) => `${item.quantity} ${item.name}`)
     : [];
+
+  // Slider Settings
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 600,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: true,
+    autoplay: true,
+    autoplaySpeed: 1000,
+    pauseOnHover: true,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
+  };
+
+  // Custom arrow components
+  function NextArrow(props) {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={`${className} !right-2 md:!right-4 z-10 flex items-center justify-center bg-black/10 rounded-full w-10 h-10`}
+        style={{
+          ...style,
+        }}
+        onClick={onClick}
+      />
+    );
+  }
+
+  function PrevArrow(props) {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={`${className} !left-2 md:!left-4 z-10 flex items-center justify-center bg-black/10 rounded-full w-10 h-10`}
+        style={{
+          ...style,
+        }}
+        onClick={onClick}
+      />
+    );
+  }
+
   return (
     <>
       <div className="pt-16"></div>
       <div className="head-container m-4 sm:m-7 md:flex md:gap-6 overflow-hidden">
-        {/* Main Image */}
-        <div className="main-img-container   aspect-video ">
-          <div className="relative w-full max-w-xl h-full ">
-            <img
-              src={coverImage}
-              alt="cooking image"
-              className="rounded-xl  w-full h-full object-cover"
+        {/* Image Slider Section */}
+        <div className="main-img-container aspect-video relative w-full max-w-xl h-full rounded-xl overflow-hidden">
+          {images.length > 0 ? (
+            <Slider {...settings} className="absolute inset-0 h-full z-0">
+              {images.map((src, i) => (
+                <div key={i} className="relative w-full h-[400px] md:h-[500px]">
+                  <Image
+                    src={src}
+                    alt={`slide-${i}`}
+                    fill
+                    className=" object-cover  rounded-xl"
+                  />
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            <Image
+              src="/images/cooking.jpg"
+              alt="default image"
+              fill
+              className="object-cover rounded-xl"
             />
+          )}
 
-            {/* Like Button */}
-            <button className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition">
-              <LikeFilledIcon classname="fill-red-500 w-4 sm:w-5 md:w-6" />
-            </button>
+          {/* Like Button */}
+          <button className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition z-10">
+            <LikeFilledIcon classname="fill-red-500 w-4 sm:w-5 md:w-6" />
+          </button>
 
-            {/* Labels */}
-            <div className="absolute bottom-2 left-3 flex flex-wrap gap-2">
-              <span className="bg-black/75 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
-                {recipe?.servings} mins
-              </span>
-              <span className="bg-green-500/90 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
-                {recipe?.dietary}
-              </span>
-            </div>
-          </div>
-          {/* Sub Images */}
-          <div className="sub-images-container max-w-xl hidden  mt-3 sm:mt-4  md:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
-            {images.map((image, idx) => (
-              <img
-                src={image}
-                alt={`Image ${idx + 1}`}
-                key={idx}
-                className="sm:w-full w-3xs aspect-[4/3] object-cover rounded-xl"
-              />
-            ))}
+          {/* Labels */}
+          <div className="absolute bottom-2 left-3 flex flex-wrap gap-2 z-10">
+            <span className="bg-black/75 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
+              {recipe?.cookTime} mins
+            </span>
+            <span className="bg-green-500/90 text-white text-xs sm:text-sm px-3 py-1 md:py-2 rounded-full">
+              {recipe?.dietary}
+            </span>
           </div>
         </div>
 
+        {/* Right Side Details */}
         <div className="overall-detail md:flex flex-col">
           <div className="recipe-main">
             <h1 className="recipe-title font-bold text-black/75 text-2xl md:text-4xl md:mb-3 mt-1">
               {recipe?.title}
             </h1>
             <p className="description md:text-lg text-gray-600 text-left">
-              {/* Rich and indulgent pasta with truffle cream sauce, perfectly
-              balanced with parmesan cheese and fresh herbs. This
-              restaurant-quality dish brings luxury dining to your home kitchen. */}
               {recipe?.description}
             </p>
           </div>
@@ -109,7 +156,6 @@ export default function RecipeDetailPage() {
             />
             <span className="text-start">
               <h5 className="text-black/75 font-medium">
-                {" "}
                 {recipe?.user?.username ? recipe?.user?.username : "MealMail"}
               </h5>
               <p className="text-gray-700 text-xs md:text-sm">Foodie</p>
@@ -136,9 +182,15 @@ export default function RecipeDetailPage() {
 
           <div className="price-order flex justify-between md:justify-normal md:gap-5 md:mt-7 mt-2">
             <span className="price text-center  bg-black/80 text-white py-2 px-3  rounded-full">
-                &#8377;189  
+              &#8377;189
             </span>
-            <button className="bg-amber-500 py-2 px-3 gap-2 hover:bg-amber-400 transition duration-150 ease-in cursor-pointer  text-white flex rounded-full">
+            <button
+              className="bg-amber-500 py-2 px-3 gap-2 hover:bg-amber-400 transition duration-150 ease-in cursor-pointer  text-white flex rounded-full"
+              onClick={() => {
+                setOpen(true);
+                setSelectedRecipe(recipe);
+              }}
+            >
               <CartIcon classname="fill-white w-4 sm:w-5 md:w-4" />
               Order Now
             </button>
@@ -151,7 +203,7 @@ export default function RecipeDetailPage() {
 
       <div className="main-container pt-5 px-3 md:p-6 pb-10 md:flex md:gap-5 gap-0 bg-gray-50">
         <div>
-          <div className="ingredients bg-white rounded-xl md:p-7 mt-5 px-3 pt-5">
+          <div className="ingredients bg-white rounded-xl md:p-7  px-3 pt-5">
             <div className="flex justify-between">
               <h3 className="font-medium text-xl">Ingredients</h3>
               <span className="flex gap-2  text-gray-600 ">
@@ -393,7 +445,7 @@ export default function RecipeDetailPage() {
           </div>
           <div className="bg-white rounded-xl py-5 mt-5   px-5">
             <h5 className="font-bold mb-3 flex text-xl">Related Recipes</h5>
-            <div className=" relative rounded-xl shadow-lg bg-gray-50 hover:scale-105 transition-transform duration-150 ease-in-out">
+            <div className=" relative rounded-xl shadow-lg bg-gray-50 hover:scale-95 transition-transform duration-300 ease-in-out">
               <img
                 src="/images/carouselimg1.jpg"
                 alt="chef"
@@ -421,6 +473,9 @@ export default function RecipeDetailPage() {
           </div>
         </div>
       </div>
+      {isOpen && (
+        <Modal recipe={selectedRecipe} open={isOpen} setOpen={setOpen} />
+      )}
     </>
   );
 }

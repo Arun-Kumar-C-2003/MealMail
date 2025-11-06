@@ -1,5 +1,5 @@
-import { getAllRecipes } from "@/server/services/recipeservice";
 import { NextResponse } from "next/server";
+import { getAllRecipes } from "@/server/services/recipeService";
 
 export async function GET() {
   try {
@@ -8,5 +8,6 @@ export async function GET() {
     return NextResponse.json(userRecipes);
   } catch (error) {
     console.error("Error Occurred in Gettting All User Recipes:", error);
+    return NextResponse.json({ status: 500 });
   }
 }

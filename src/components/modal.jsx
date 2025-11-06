@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import { CrossIcon } from "./svgicons";
+import { useRouter } from "next/navigation";
 
 export default function Modal({ recipe, open, setOpen }) {
   const [quantity, setQuantity] = useState(1);
 
   const handleOpen = () => setOpen(!open);
-
+  const router = useRouter();
+  // [title, price, quantity, image]
   // useEffect(() => {
   //   if (open) {
   //     document.body.style.overflow = "hidden";
@@ -18,7 +20,7 @@ export default function Modal({ recipe, open, setOpen }) {
   //     document.body.style.overflow = "auto";
   //   };
   // }, [open]);
-
+  const price = 200;
   useEffect(() => {
     if (open) {
       const scrollBarWidth =
@@ -78,6 +80,7 @@ export default function Modal({ recipe, open, setOpen }) {
               alt={recipe?.title || "Recipe"}
               className="w-full h-full object-cover"
             />
+            {/* <p className="absolute bottom-2 py-1 px-2 rounded-xl bg-blue-500/90 right-2 text-white">50% off</p> */}
           </div>
 
           {/* Content */}
@@ -90,7 +93,9 @@ export default function Modal({ recipe, open, setOpen }) {
 
             {/* Price and Quantity */}
             <div className="flex items-center justify-between">
-              <div className="text-2xl font-bold text-gray-900">&#8377;200</div>
+              <div className="text-2xl font-bold text-gray-900">
+                &#8377;{price}
+              </div>
 
               <div className="flex items-center bg-gray-100 rounded-lg px-3 py-2">
                 <button
@@ -123,7 +128,15 @@ export default function Modal({ recipe, open, setOpen }) {
         <div className="border-t p-4 bg-white">
           <div className="flex gap-3">
             <button
-              onClick={handleOpen}
+              onClick={() =>
+                router.push(
+                  `/cart?food=${recipe?.title}&price=${price}&pic=${
+                    recipe?.images?.length
+                      ? recipe.images.find((img) => img.isCover)?.url
+                      : recipe?.image?.url || "/images/cooking.jpg"
+                  }&quantity=${quantity}`
+                )
+              }
               className="flex-1 py-2 px-4 border border-gray-800 rounded-lg font-medium text-gray-800 hover:bg-gray-800 cursor-pointer hover:text-white transition-colors"
             >
               Add To Cart

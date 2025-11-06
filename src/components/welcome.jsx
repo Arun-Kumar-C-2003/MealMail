@@ -26,12 +26,24 @@ export const SignUp = () => {
   );
 };
 
+export const WelcomeHome = () => {
+  const router = useRouter();
+  return (
+    <button
+      onClick={() => router.push("/")}
+      className="w-full cursor-pointer py-2 px-4 bg-amber-500 text-white rounded-md hover:bg-amber-400 transition"
+    >
+      Home
+    </button>
+  );
+};
+
 export const Login = () => {
   const router = useRouter();
   return (
     <button
       onClick={() => router.push("/login")}
-      className="w-full hover:cursor-pointer py-2 px-4 bg-gray-950 text-slate-50 rounded-md hover:bg-gray-800 transition mt-2"
+      className="w-full cursor-pointer py-2 px-4 bg-gray-950 text-slate-50 rounded-md hover:bg-gray-800 transition mt-2"
     >
       Sign In
     </button>
@@ -132,13 +144,15 @@ export default function Welcome() {
         </Slider>
 
         {/* 🔹 TOP NAV */}
-        <ul className="absolute top-5 left-5 z-10 flex gap-5 sm:gap-7">
-          <li className="list-none text-sm sm:text-base font-bold text-orange-600 font-[emoji] hover:text-yellow-400 transition">
+        <ul className="absolute top-5 right-10 z-10 items-baseline flex gap-5 sm:gap-7">
+          {/* <li className="list-none bg-white p-2 rounded-xl text-sm sm:text-base font-bold text-black  hover:text-amber-500 cursor-pointer transition">
             HOME
           </li>
-          <li className="list-none text-sm sm:text-base font-bold text-orange-600 font-[emoji] hover:text-yellow-400 transition">
+          <li className="list-none bg-white p-2 rounded-xl text-sm sm:text-base font-bold text-black  hover:text-amber-500 cursor-pointer transition">
             SIGN UP
-          </li>
+          </li> */}
+          <li><WelcomeHome/></li>
+          <li><Login/></li>
         </ul>
 
         {/* 🔹 MAIN TEXT */}

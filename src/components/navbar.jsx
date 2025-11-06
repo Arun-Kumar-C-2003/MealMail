@@ -30,6 +30,7 @@ export default function NavBar() {
     { icon: HomeIcon, link: "home" },
     { icon: SearchIcon, link: "search" },
     { icon: AddIcon, link: "addrecipe" },
+    { icon: DeliveryIcon, link: "orders" },
     { icon: StoreIcon, link: "stores" },
   ];
   const pathname = usePathname();
@@ -96,54 +97,33 @@ export default function NavBar() {
             </div>
 
             {/* Liked Recipes Button */}
-            <button title="liked">
-              <LikeFilledIcon classname="w-6 cursor-pointer h-6 transition-colors duration-150 ease-in hover:fill-amber-500 fill-gray-700" />
-            </button>
+            <div className="flex  items-baseline space-x-7">
+              <button title="liked ">
+                <LikeFilledIcon classname="w-6 cursor-pointer h-6 transition-colors duration-150 ease-in hover:fill-amber-500 fill-gray-700" />
+              </button>
 
-            {/* Cart Button */}
-            <button title="cart">
-              <CartIcon
-                classname={`w-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer h-6 fill-gray-700`}
-              />
-            </button>
-            <div className=""
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpen((prev) => !prev);
-              }}>
-                
+              {/* Cart Button */}
+              <div className="relative">
+                <button title="cart" onClick={() => router.push("/cart")}>
+                  <CartIcon classname="w-6 h-6 fill-gray-700 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer" />
+                </button>
+
+                {/* Notification dot */}
+                {/* <span className="absolute top-0 right-0 bg-red-500 rounded-full w-2 h-2"></span> */}
+              </div>
+
+              {/* Profile Icon => User Profile Appears Instead of Icon */}
               {pathname === "/profile" ? (
-                <HamburgerIcon classname="w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700" />
+                <HamburgerIcon
+                  classname={`w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700`}
+                />
               ) : (
-                <ProfileIcon classname="w-6 h-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer fill-gray-700" />
+                <button title="profile" onClick={() => router.push("/profile")}>
+                  <ProfileIcon
+                    classname={`w-6 h-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer fill-gray-700`}
+                  />
+                </button>
               )}
-
-             {open && pathname === "/profile" && (
-  <div className="absolute right-0 mt-3 w-52  h-120 bg-white shadow-lg rounded-xl z-50 p-2">
-    <button className="flex items-center gap-3 w-full text-left px-3 py-2 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
-      <MdOutlineMenuBook className="text-xl" />
-      <span>Menu</span>
-    </button>
-
-    <button className="flex items-center gap-3 w-full text-left px-3 py-2 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
-      <MdOutlineCollectionsBookmark className="text-xl" />
-      <span>Collection</span>
-    </button>
-
-    <button className="flex items-center gap-3 w-full text-left px-3 py-2 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
-      <MdBorderColor className="text-xl" />
-      <span>Order</span>
-    </button>
-
-    <div className="border-t my-2" />
-
-    <button className="flex items-center gap-3 w-full text-left px-3 py-2 text-gray-700 rounded-md hover:bg-red-50 hover:text-red-500 transition">
-      <RiLogoutCircleRLine className="text-xl" />
-      <span>Logout</span>
-    </button>
-  </div>
-)}
-
             </div>
           </div>
         </nav>
@@ -160,7 +140,9 @@ export default function NavBar() {
                 aria-disabled={isActive}
                 className={`${
                   isActive ? "bg-amber-500 rounded-md" : ""
-                }  fill-gray-200 w-7 h-7  transition-colors duration-300 p-1 ease-in-out`}>
+                }  fill-gray-200 w-7 h-7  transition-colors duration-300 p-1 ease-in-out`}
+              >
+                {/* {link.charAt(0).toUpperCase() + link.slice(1)} */}
                 <item.icon />
               </Link>
             );
