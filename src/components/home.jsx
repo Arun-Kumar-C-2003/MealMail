@@ -1,22 +1,9 @@
 "use client";
-import {
-  AddIcon,
-  CartIcon,
-  DeliveryIcon,
-  HomeIcon,
-  LikeFilledIcon,
-  ProfileIcon,
-  ResetIcon,
-  SearchIcon,
-  ShareIcon,
-  StoreIcon,
-} from "@/components/svgicons";
+import { CartIcon, LikeFilledIcon, ShareIcon } from "@/components/svgicons";
 import NavBar from "./navbar";
-// import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./loaders";
-// import Dialog from "./modal";
 import Modal from "./modal";
 
 export default function Home() {
@@ -57,9 +44,9 @@ export default function Home() {
   useEffect(() => {
     async function getAllUserRecipes() {
       try {
+        // src\app\api\recipes\user_recipes\route.js
         const response = await fetch("/api/recipes/user_recipes");
         console.log("Getting Recipes");
-        // src\app\api\recipes\user_recipes\route.js
         const data = await response.json();
         if (Array.isArray(data) && data.length > 0) {
           setUserRecipes(data);
@@ -78,6 +65,7 @@ export default function Home() {
     }
     getAllUserRecipes();
   }, []);
+  
   return (
     <>
       <NavBar />
@@ -214,7 +202,9 @@ export default function Home() {
                   <h5 className="font-medium text-xl text-black/90">
                     {recipe.title}
                   </h5>
-                  <p className="text-gray-700 text-sm mt-1 mb-1">{recipe.description}</p>
+                  <p className="text-gray-700 text-sm mt-1 mb-1">
+                    {recipe.description}
+                  </p>
                 </div>
 
                 <div className="px-3 pb-2 flex justify-between items-center">

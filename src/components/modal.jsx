@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { CrossIcon } from "./svgicons";
 import { useRouter } from "next/navigation";
+import { addToCart } from "@/app/slices/cartslice";
+import { useDispatch } from "react-redux";
 
 export default function Modal({ recipe, open, setOpen }) {
   const [quantity, setQuantity] = useState(1);
@@ -20,7 +22,9 @@ export default function Modal({ recipe, open, setOpen }) {
   //     document.body.style.overflow = "auto";
   //   };
   // }, [open]);
-  const price = 200;
+  const baseprice = 210;
+  const [price, setPrice] = useState(baseprice);
+  const dispatch = useDispatch();
   useEffect(() => {
     if (open) {
       const scrollBarWidth =
@@ -36,6 +40,27 @@ export default function Modal({ recipe, open, setOpen }) {
       document.body.style.paddingRight = "0px";
     };
   }, [open]);
+
+  useEffect(() => {
+    if (quantity) {
+      setPrice(baseprice * quantity);
+    }
+  }, [quantity]);
+
+  const handleAddToCart = () => {
+    const item = {
+      title: recipe?.title,
+      quantity,
+      image: recipe?.images?.length
+        ? recipe.images.find((img) => img.isCover)?.url
+        : recipe?.image?.url || "/images/cooking.jpg",
+      price,
+      description: recipe.description,
+      id: recipe._id,
+    };
+    dispatch(addToCart(item));
+    router.push("/cart");
+  };
 
   return (
     <div
@@ -61,7 +86,7 @@ export default function Modal({ recipe, open, setOpen }) {
           </h2>
           <button
             onClick={handleOpen}
-            className="flex-shrink-0 cursor-pointer text-gray-500 hover:text-gray-700 p-1"
+            className="shrink-0 cursor-pointer text-gray-500 hover:text-gray-700 p-1"
           >
             <CrossIcon />
           </button>
@@ -128,15 +153,7 @@ export default function Modal({ recipe, open, setOpen }) {
         <div className="border-t p-4 bg-white">
           <div className="flex gap-3">
             <button
-              onClick={() =>
-                router.push(
-                  `/cart?food=${recipe?.title}&price=${price}&pic=${
-                    recipe?.images?.length
-                      ? recipe.images.find((img) => img.isCover)?.url
-                      : recipe?.image?.url || "/images/cooking.jpg"
-                  }&quantity=${quantity}`
-                )
-              }
+              onClick={handleAddToCart}
               className="flex-1 py-2 px-4 border border-gray-800 rounded-lg font-medium text-gray-800 hover:bg-gray-800 cursor-pointer hover:text-white transition-colors"
             >
               Add To Cart
