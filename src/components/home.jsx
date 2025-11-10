@@ -68,7 +68,7 @@ export default function Home() {
   
   return (
     <>
-      <NavBar />
+      {/* <NavBar /> */}
 
       {/* Hero Section */}
       <div className="pt-16 ">

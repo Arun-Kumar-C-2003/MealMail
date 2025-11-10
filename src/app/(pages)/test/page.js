@@ -48,9 +48,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import { setRecipes, setError, setLoading } from "@/app/slices/recipeslice";
 
 export default function Home() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const { userRecipes, loading } = useSelector((state) => state.recipes);
 
@@ -71,23 +73,33 @@ export default function Home() {
         {loading ? (
           <p>loading</p>
         ) : (
-          <div>
-            {userRecipes.map((recipe) => {
-              console.log(recipe?.image?.url);
-              return (
-                <div key={recipe?.image?.url}>
-                  <p>{recipe.title}</p>
+          <div className="grid grid-cols-3 gap-4 place-items-center pb-10 w-full">
+            {userRecipes.map((recipe) => (
+              <div>
+                {recipe.images && recipe.images.length > 0 ? (
                   <img
                     src={
-                      recipe?.image?.url
-                        ? recipe.image.url
-                        : "/images/cooking.jpg"
+                      recipe.images.find((img) => img.isCover)?.url ||
+                      "/images/cooking.jpg"
                     }
-                    className="w-50 h-50"
+                    alt={recipe.title}
+                    className="w-50 h-44  object-cover cursor-pointer  rounded-2xl"
+                    onClick={() =>
+                      router.push(`/recipedetails?id=${recipe._id}`)
+                    }
                   />
-                </div>
-              );
-            })}
+                ) : (
+                  <img
+                    src={recipe?.image?.url || "/images/cooking.jpg"}
+                    alt={recipe.title}
+                    className="w-50 h-44  object-cover cursor-pointer  rounded-2xl"
+                    onClick={() =>
+                      router.push(`/recipedetails?id=${recipe._id}`)
+                    }
+                  />
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>
