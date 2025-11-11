@@ -2,6 +2,7 @@ import "./globals.css";
 import AuthGuard from "@/utils/authguard";
 import SessionWrapper from "@/utils/sessionwrapper";
 import { NavPathChecker } from "@/utils/sessionwrapper";
+import ReduxProvider from "@/components/reduxprovider";
 // import { Inter } from "next/font/google";
 
 // const inter = Inter({ subsets: ['latin'] });
@@ -31,7 +32,9 @@ export default function RootLayout({ children }) {
       >
         <SessionWrapper>
           <NavPathChecker />
-          <AuthGuard>{children}</AuthGuard>
+          <AuthGuard>
+            <ReduxProvider>{children}</ReduxProvider>
+          </AuthGuard>
         </SessionWrapper>
       </body>
     </html>
