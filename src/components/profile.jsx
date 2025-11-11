@@ -106,8 +106,7 @@ export default function Profile() {
             <h5 className="text-lg font-bold">{postCount}</h5>
             <p
               className="text-gray-500 cursor-pointer"
-              onClick={scrollToSection}
-            >
+              onClick={scrollToSection}>
               Recipes
             </p>
           </div>
