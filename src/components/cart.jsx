@@ -103,37 +103,42 @@ const Cart = () => {
       <>
         <div className="w-full pt-16 h-screen bg-gray-50 flex flex-col">
           <h1 className="pl-8 pt-5 text-4xl font-medium">My Cart</h1>
-          <div className="p-10">
-            {cartData?.map((item, index) => (
-              <div className="flex bg-white shadow rounded-xl p-2 mb-2 items-center ">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-20 aspect-square rounded-full mr-2 object-cover "
-                />
-                <div className="flex flex-col justify-center">
-                  <p className="font-medium text-lg">{item.title}</p>
-                  <p className="text-gray-500 text-xs">{item.description}</p>
-                  <div className="bg-gray-50 w-32 shadow flex justify-between items-center p-2 rounded-xl mt-3">
-                    <button
-                      className="bg-white flex items-center justify-center rounded-full shadow w-5 h-5 hover:text-amber-500 cursor-pointer"
-                      onClick={() =>
-                        setQuantity(quantity > 1 ? quantity - 1 : 1)
-                      }
-                    >
-                      -
-                    </button>
-                    <p>{quantity}</p>
-                    <button
-                      className="bg-white flex items-center justify-center rounded-full shadow w-5 h-5 hover:text-amber-500 cursor-pointer"
-                      onClick={() => setQuantity(quantity + 1)}
-                    >
-                      +
-                    </button>
+          <div className="flexZ">
+            <div className="p-10">
+              {cartData?.map((item, index) => (
+                <div className="flex bg-white shadow rounded-xl p-2 mb-2 items-center ">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-20 aspect-square rounded-full mr-2 object-cover "
+                  />
+                  <div className="flex flex-col justify-center">
+                    <p className="font-medium text-lg">{item.title}</p>
+                    <p className="text-gray-500 text-xs">{item.description}</p>
+                    <div className="bg-gray-50 w-32 shadow flex justify-between items-center p-2 rounded-xl mt-3">
+                      <button
+                        className="bg-white flex items-center justify-center rounded-full shadow w-5 h-5 hover:text-amber-500 cursor-pointer"
+                        onClick={() =>
+                          setQuantity(quantity > 1 ? quantity - 1 : 1)
+                        }
+                      >
+                        -
+                      </button>
+                      <p>{quantity}</p>
+                      <button
+                        className="bg-white flex items-center justify-center rounded-full shadow w-5 h-5 hover:text-amber-500 cursor-pointer"
+                        onClick={() => setQuantity(quantity + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="bg-white shadwo">
+              <h5>Order Summary</h5>
+            </div>
           </div>
         </div>
       </>
