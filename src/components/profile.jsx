@@ -87,7 +87,7 @@ export default function Profile() {
   return (
     <div className="mt-10 border-t border-gray-200  flex justify-center">
       <div className="shadow-xl py-8 px-10">
-        <div className="flex  gap-12">
+        <div className="flex  gap-30">
           {/* Profile Picture */}
           <div>
             <img
@@ -95,7 +95,7 @@ export default function Profile() {
               alt="profile image"
               className="w-36 h-36 rounded-full object-cover"/>
 
-            <div className="flex justify-center mt-5">
+            <div className="flex justify-center mt-5 pl-10">
               <span className=" text-xl font-semibold">
                 {session?.user?.name || "Guest"}
               </span>
@@ -120,9 +120,10 @@ export default function Profile() {
           <div className="">
             <h5 className="text-lg font-bold mt-12">{following}</h5>
             <p className="text-gray-500">Following</p>
+
           </div>
         </div>
-        <div className="border-t border-gray-200 mt-8">
+        <div className="border-t border-gray-200 mt-6">
           <section className="mt-10">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-semibold">My Creations</h2>

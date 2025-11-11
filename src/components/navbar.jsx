@@ -17,6 +17,7 @@ import { MdOutlineCollectionsBookmark } from "react-icons/md";
 import { MdOutlineMenuBook } from "react-icons/md";
 import { RiLogoutCircleRLine } from "react-icons/ri";
 import { MdBorderColor } from "react-icons/md";
+import { IoSettingsOutline } from "react-icons/io5";
 
 export default function NavBar() {
   const navLinks = [
@@ -33,12 +34,13 @@ export default function NavBar() {
     { icon: DeliveryIcon, link: "orders" },
     { icon: StoreIcon, link: "stores" },
   ];
+
+  const router = useRouter();
   const pathname = usePathname();
   const isLogoActive = pathname === navLinks[0].linkTo;
 
-  const router = useRouter();
   const navigator = (href) => {
-    if (router.pathname !== href) {
+    if (pathname !== href) {
       router.push(href);
     }
   };
@@ -46,9 +48,9 @@ export default function NavBar() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const handleOutside = () => setOpen(false);
-    // window.addEventListener("click", handleOutside);
-    // return () => window.removeEventListener("click", handleOutside);
+    const handleOutside = () => setOpen(true);
+    window.addEventListener("click", handleOutside);
+    return () => window.removeEventListener("click", handleOutside);
   }, []);
 
   return (
@@ -70,13 +72,11 @@ export default function NavBar() {
                 <Link
                   key={`${link.linkName + index}`}
                   href={href}
-                  // href={`/${link.linkTo == "home" ? "home" : link.linkTo}`}
                   aria-disabled={isActive}
                   className={`${
                     isActive ? "text-amber-500" : "text-black/90"
                   } p-2 bg-transparent  hover:text-amber-500 rounded-md  transition-colors duration-150 ease-in`}
                 >
-                  {/* {link.charAt(0).toUpperCase() + link.slice(1)} */}
                   {link.linkName}
                 </Link>
               );
@@ -92,8 +92,7 @@ export default function NavBar() {
               <input
                 type="text"
                 placeholder="Search recipes, creators..."
-                className="ml-2 w-full outline-none bg-transparent"
-              />
+                className="ml-2 w-full outline-none bg-transparent"/>
             </div>
 
             {/* Liked Recipes Button */}
@@ -107,22 +106,53 @@ export default function NavBar() {
                 <button title="cart" onClick={() => router.push("/cart")}>
                   <CartIcon classname="w-6 h-6 fill-gray-700 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer" />
                 </button>
-
-                {/* Notification dot */}
-                {/* <span className="absolute top-0 right-0 bg-red-500 rounded-full w-2 h-2"></span> */}
               </div>
-
-              {/* Profile Icon => User Profile Appears Instead of Icon */}
               {pathname === "/profile" ? (
-                <HamburgerIcon
-                  classname={`w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700`}
-                />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpen((prev) => !prev);
+                  }}
+                >
+                  <HamburgerIcon
+                    classname={`w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700`}
+                  />
+                </button>
               ) : (
                 <button title="profile" onClick={() => router.push("/profile")}>
                   <ProfileIcon
-                    classname={`w-6 h-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer fill-gray-700`}
+                    classname={`w-7 h-7 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer fill-gray-700`}
                   />
                 </button>
+              )}
+              {open && pathname === "/profile" && (
+                <div className="absolute right-6 mt-15 w-58  h-auto bg-white shadow-lg rounded-xl z-50 p-2">
+                  <button className="flex items-center gap-3 w-full text-center px-15 py-4 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
+                    <MdOutlineMenuBook className="text-xl" />
+                    <span>Menu</span>
+                  </button>
+
+                  <button className="flex  gap-3  text-center px-15 py-4 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
+                    <MdOutlineCollectionsBookmark className="h-7 text-xl" />
+                    <span>Collection</span>
+                  </button>
+
+                  <button className="flex items-center gap-3 w-full text-left px-15 py-4 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
+                    <MdBorderColor className="text-xl" />
+                    <span>Order</span>
+                  </button>
+
+                  <button className="flex items-center gap-3 w-full text-left px-15 py-4 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
+                    <IoSettingsOutline className="text-xl" />
+                    <span>Settings</span>
+                  </button>
+
+                  <div className="border-t"/>
+                  <button className="flex gap-3 w-full text-center px-15 py-5 text-gray-700 rounded-md hover:bg-red-50 hover:text-red-500 transition">
+                    <RiLogoutCircleRLine className="text-xl" />
+                    <span>Logout</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>
