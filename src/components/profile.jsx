@@ -57,7 +57,7 @@ export default function Profile() {
             >
               <img
                 src={
-                  recipe.images.find((img) => img.isCover)?.url ||
+                  recipe?.images?.find((img) => img.isCover)?.url ||
                   "/images/cooking.jpg"
                 }
                 alt={recipe.title}
@@ -140,7 +140,7 @@ export default function Profile() {
                 >
                   <img
                     src={
-                      recipe.images.find((img) => img.isCover)?.url ||
+                      recipe?.images?.find((img) => img.isCover)?.url ||
                       "/images/cooking.jpg"
                     }
                     alt={recipe.name}

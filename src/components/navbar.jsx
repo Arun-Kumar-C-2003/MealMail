@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import {
   HomeIcon,
   AddIcon,
@@ -148,7 +149,8 @@ export default function NavBar() {
                   </button>
 
                   <div className="border-t"/>
-                  <button className="flex gap-3 w-full text-center px-15 py-5 text-gray-700 rounded-md hover:bg-red-50 hover:text-red-500 transition">
+                  <button className="flex gap-3 w-full text-center px-15 py-5 text-gray-700 rounded-md hover:bg-red-50 hover:text-red-500 transition"
+                  onClick={()=>signOut({callbackUrl:"/login"})}>
                     <RiLogoutCircleRLine className="text-xl" />
                     <span>Logout</span>
                   </button>
