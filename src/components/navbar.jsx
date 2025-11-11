@@ -94,7 +94,7 @@ export default function NavBar() {
               <input
                 type="text"
                 placeholder="Search recipes, creators..."
-                className="ml-2 w-full outline-none bg-transparent"
+                className="ml-2 placeholder-gray-500 w-full outline-none bg-transparent"
               />
             </div>
 
