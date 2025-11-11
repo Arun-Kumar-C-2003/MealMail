@@ -11,6 +11,7 @@ import {
   StoreIcon,
   DeliveryIcon,
   HamburgerIcon,
+  CrossIcon,
 } from "./svgicons";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -49,7 +50,7 @@ export default function NavBar() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const handleOutside = () => setOpen(true);
+    const handleOutside = () => setOpen(false);
     window.addEventListener("click", handleOutside);
     return () => window.removeEventListener("click", handleOutside);
   }, []);
@@ -93,7 +94,8 @@ export default function NavBar() {
               <input
                 type="text"
                 placeholder="Search recipes, creators..."
-                className="ml-2 w-full outline-none bg-transparent"/>
+                className="ml-2 w-full outline-none bg-transparent"
+              />
             </div>
 
             {/* Liked Recipes Button */}
@@ -115,9 +117,13 @@ export default function NavBar() {
                     setOpen((prev) => !prev);
                   }}
                 >
-                  <HamburgerIcon
-                    classname={`w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700`}
-                  />
+                  {open ? (
+                    <CrossIcon classname="w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700" />
+                  ) : (
+                    <HamburgerIcon
+                      classname={`w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700`}
+                    />
+                  )}
                 </button>
               ) : (
                 <button title="profile" onClick={() => router.push("/profile")}>
@@ -148,9 +154,11 @@ export default function NavBar() {
                     <span>Settings</span>
                   </button>
 
-                  <div className="border-t"/>
-                  <button className="flex gap-3 w-full text-center px-15 py-5 text-gray-700 rounded-md hover:bg-red-50 hover:text-red-500 transition"
-                  onClick={()=>signOut({callbackUrl:"/login"})}>
+                  <div className="border-t" />
+                  <button
+                    className="flex gap-3 w-full text-center px-15 py-5 text-gray-700 rounded-md hover:bg-red-50 hover:text-red-500 transition"
+                    onClick={() => signOut({ callbackUrl: "/login" })}
+                  >
                     <RiLogoutCircleRLine className="text-xl" />
                     <span>Logout</span>
                   </button>

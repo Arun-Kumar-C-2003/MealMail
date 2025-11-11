@@ -88,7 +88,7 @@ export default function Modal({ recipe, open, setOpen }) {
             onClick={handleOpen}
             className="shrink-0 cursor-pointer text-gray-500 hover:text-gray-700 p-1"
           >
-            <CrossIcon />
+            <CrossIcon classname={"h-7 w-7 hover:scale-105 transform transition bg-white shadow-md"} />
           </button>
         </div>
 
