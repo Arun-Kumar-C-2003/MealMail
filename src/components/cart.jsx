@@ -106,7 +106,10 @@ const Cart = () => {
           <div className="flexZ">
             <div className="p-10">
               {cartData?.map((item, index) => (
-                <div className="flex bg-white shadow rounded-xl p-2 mb-2 items-center ">
+                <div
+                  className="flex bg-white shadow rounded-xl p-2 mb-2 items-center "
+                  key={index}
+                >
                   <img
                     src={item.image}
                     alt={item.title}

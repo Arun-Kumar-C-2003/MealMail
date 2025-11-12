@@ -40,11 +40,10 @@ class DBConnect {
       throw error;
     }
   }
-  getAll = async (collectionName) => {
+  getAll = async (collectionName, { skip = 0, limit = 10 } = {}) => {
     try {
       const db = await this.connect();
       const tableCollection = db.collection(collectionName);
-      // const tableCollection = db.collection(tableName);
       const find = await tableCollection
         .aggregate([
           {
@@ -59,10 +58,12 @@ class DBConnect {
             },
           },
           { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+          { $sort: { createdAt: -1 } },
+          { $skip: skip },
+          { $limit: limit },
         ])
         .toArray();
 
-      // console.log("This is from index.js", find);
       return find;
     } catch (error) {
       console.error("Error Getting Data", error);
