@@ -6,10 +6,10 @@ const collectionName = "recipes";
 const db = new DBConnect();
 // const db = await dbInstance.connect();
 
-export async function getAllRecipes() {
+export async function getAllRecipes({ page = 1, limit = 10 } = {}) {
   try {
-    const recipes = await db.getAll(collectionName);
-    // console.log('This is form recipeServic.js',recipes);
+    const skip = (page - 1) * limit;
+    const recipes = await db.getAll(collectionName, { skip, limit });
     return recipes;
   } catch (error) {
     console.error("Error fetching recipes:", error);
@@ -54,7 +54,7 @@ export async function getRecipeById(id) {
     }
 
     const recipe = await db.getOne({ _id: new ObjectId(id) }, collectionName);
-    console.log("This is the GetRecipeById service")
+    console.log("This is the GetRecipeById service");
     return recipe;
   } catch (error) {
     console.error("Error in getRecipeById:", error);

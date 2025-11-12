@@ -11,6 +11,7 @@ import {
   StoreIcon,
   DeliveryIcon,
   HamburgerIcon,
+  NotificationIcon,
   CrossIcon,
 } from "./svgicons";
 import { usePathname, useRouter } from "next/navigation";
@@ -86,22 +87,29 @@ export default function NavBar() {
           </ul>
 
           <div className="flex space-x-7 items-center">
-            <div className="hidden md:flex items-center border border-gray-600 rounded-full p-1 focus-within:border-transparent focus-within:ring-2 focus-within:ring-amber-500">
+            <div
+              className="hidden md:flex items-center hover:shadow-md transition cursor-pointer bg-gray-50 gap-1 shadow rounded-xl py-1 px-5"
+              onClick={() => router.push("/search")}
+            >
               {/* Icon */}
-              <SearchIcon classname="fill-gray-400 w-8 h-8" />
+              <SearchIcon classname="fill-gray-700 w-6 h-6" />
 
               {/* Input */}
-              <input
+              {/* <input
                 type="text"
                 placeholder="Search recipes, creators..."
                 className="ml-2 placeholder-gray-500 w-full outline-none bg-transparent"
-              />
+              /> */}
+              <p className="text-gray-700  text-lg  ">search</p>
             </div>
 
             {/* Liked Recipes Button */}
             <div className="flex  items-baseline space-x-7">
               <button title="liked ">
                 <LikeFilledIcon classname="w-6 cursor-pointer h-6 transition-colors duration-150 ease-in hover:fill-amber-500 fill-gray-700" />
+              </button>
+              <button title="liked ">
+                <NotificationIcon classname="w-6 cursor-pointer h-6 transition-colors duration-150 ease-in hover:fill-amber-500 fill-gray-700" />
               </button>
 
               {/* Cart Button */}

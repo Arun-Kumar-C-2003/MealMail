@@ -1,7 +1,6 @@
 "use client";
 import { CartIcon, LikeFilledIcon, ShareIcon } from "@/components/svgicons";
-import NavBar from "./navbar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./loaders";
 import Modal from "./modal";
@@ -32,11 +31,14 @@ export default function Home() {
   const [selectedOption, setSelectedOption] = useState(filterOptions[0]);
   const [likeState, setLikeState] = useState(false);
   const [followState, setFollowState] = useState(false);
-  const [userRecipes, setUserRecipes] = useState([]);
   const [totalRecipes, setTotalRecipes] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isOpen, setOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [userRecipes, setUserRecipes] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const loader = useRef(null);
   const router = useRouter();
 
   const time = "20";
@@ -45,27 +47,43 @@ export default function Home() {
     async function getAllUserRecipes() {
       try {
         // src\app\api\recipes\user_recipes\route.js
-        const response = await fetch("/api/recipes/user_recipes");
+        const response = await fetch(
+          `/api/recipes/user_recipes?page=${page}&limit=10`
+        );
         console.log("Getting Recipes");
         const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setUserRecipes(data);
-          setTotalRecipes(data.length);
+        if (Array.isArray(data.userRecipes) && data.userRecipes.length > 0) {
+          setUserRecipes((prev) => [...prev, ...data.userRecipes]);
+          setHasMore(data.hasMore);
         } else {
           setUserRecipes([]);
-          setTotalRecipes(0);
+          setHasMore(false);
         }
       } catch (error) {
         console.error("Error in Home page getting user recipes:", error);
         setUserRecipes([]);
-        setTotalRecipes(0);
       } finally {
         setLoading(false);
       }
     }
     getAllUserRecipes();
-  }, []);
-  
+  }, [page]);
+
+  useEffect(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage((prev) => prev + 1);
+      }
+    },
+    { threshold: 1 }
+  );
+
+  if (loader.current) observer.observe(loader.current);
+  return () => loader.current && observer.unobserve(loader.current);
+}, [hasMore]);
+
+
   return (
     <>
       {/* <NavBar /> */}
@@ -144,7 +162,7 @@ export default function Home() {
         <hr className="border-t border-gray-300" />
         {loading ? <Spinner /> : ""}
         <div className="bg-gray-100 p-3 md:px-8 mb-10 md:mb-0 grid gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 ">
-          {userRecipes.slice(0, totalRecipes).map((recipe, index) => {
+          {userRecipes.map((recipe, index) => {
             const randomBGClass = randomBG[index % randomBG.length];
 
             return (
@@ -263,6 +281,8 @@ export default function Home() {
             );
           })}
         </div>
+        {hasMore && <div ref={loader} className="h-10"></div>}
+
         {isOpen && (
           <Modal recipe={selectedRecipe} open={isOpen} setOpen={setOpen} />
         )}
