@@ -60,7 +60,7 @@ export default function RecipeDetailPage() {
     slidesToShow: 1,
     slidesToScroll: 1,
     arrows: true,
-    autoplay: true,
+    autoplay: false,
     autoplaySpeed: 1000,
     pauseOnHover: true,
     nextArrow: <NextArrow />,
@@ -169,7 +169,7 @@ export default function RecipeDetailPage() {
               { value: "4.8", label: "Rating" },
               { value: recipe?.cookTime, label: "Minutes" },
               { value: recipe?.servings, label: "Servings" },
-              { value: "343", label: "Likes" },
+              { value: recipe?.likedBy?.length, label: "Likes" },
             ].map((item) => (
               <div key={item.label}>
                 <h3 className="font-medium text-lg md:text-2xl text-black/90">

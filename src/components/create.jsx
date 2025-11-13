@@ -72,6 +72,7 @@ export default function CreateRecipe() {
       dietary: selected.toLowerCase() === "other" ? otherType : selected,
       ingredients: cleanedIngredients,
       instructions: cleanedInstructions,
+      // likedBy: [],
       images: [],
     };
 

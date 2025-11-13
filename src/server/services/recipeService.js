@@ -129,6 +129,41 @@ export async function updateRecipe(id, updatedData) {
   return true;
 }
 
+// export async function updateRecipe(id, updatedData) {
+//   if (!ObjectId.isValid(id)) {
+//     throw new Error("Invalid recipe ID");
+//   }
+
+//   const objectId = new ObjectId(id.toString());
+
+//   // Add a timestamp
+//   updatedData.updatedAt = new Date();
+
+//   // Build dynamic Mongo update object
+//   const updateOps = {};
+
+//   for (const [key, value] of Object.entries(updatedData)) {
+//     if (Array.isArray(value)) {
+//       // Append array values (no duplicates)
+//       updateOps.$addToSet = updateOps.$addToSet || {};
+//       updateOps.$addToSet[key] = { $each: value };
+//     } else {
+//       // Replace or set a single field
+//       updateOps.$set = updateOps.$set || {};
+//       updateOps.$set[key] = value;
+//     }
+//   }
+
+//   const result = await db.updateOne(
+//     collectionName,
+//     { _id: objectId },
+//     updateOps
+//   );
+
+//   return result; // return the full result object (contains matchedCount, modifiedCount, etc.)
+// }
+
+
 export async function deleteRecipe(id) {
   if (!ObjectId.isValid(id)) {
     throw new Error("Invalid recipe ID");
@@ -146,3 +181,4 @@ export async function deleteRecipe(id) {
 
   return true;
 }
+
