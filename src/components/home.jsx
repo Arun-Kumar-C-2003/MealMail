@@ -1,21 +1,10 @@
 "use client";
-import {
-  AddIcon,
-  CartIcon,
-  DeliveryIcon,
-  HomeIcon,
-  LikeFilledIcon,
-  ProfileIcon,
-  ResetIcon,
-  SearchIcon,
-  ShareIcon,
-  StoreIcon,
-} from "@/components/svgicons";
-import NavBar from "./navbar";
-// import Link from "next/link";
-import { useState, useEffect } from "react";
+import { CartIcon, LikeFilledIcon, ShareIcon } from "@/components/svgicons";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./loaders";
+import Modal from "./modal";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
   const randomBG = [
@@ -33,7 +22,7 @@ export default function Home() {
 
   const filterOptions = [
     "All",
-    "Pure veg",
+    "Vegetarian",
     "Breakfast",
     "Lunch",
     "Dinner",
@@ -41,11 +30,17 @@ export default function Home() {
   ];
   const sortOptions = ["Popular", "Rating", "Newest", "Cook Time"];
   const [selectedOption, setSelectedOption] = useState(filterOptions[0]);
-  const [likeState, setLikeState] = useState(false);
   const [followState, setFollowState] = useState(false);
-  const [userRecipes, setUserRecipes] = useState([]);
-  const [totalRecipes, setTotalRecipes] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setOpen] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [userRecipes, setUserRecipes] = useState([]);
+  const [allRecipes, setAllRecipes] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const loader = useRef(null);
+  const [likes, setLikes] = useState({});
+  const { data: session } = useSession();
   const router = useRouter();
 
   const time = "20";
@@ -53,34 +48,155 @@ export default function Home() {
   useEffect(() => {
     async function getAllUserRecipes() {
       try {
-        const response = await fetch("/api/recipes/user_recipes");
-        console.log("Getting Recipes");
         // src\app\api\recipes\user_recipes\route.js
+        const response = await fetch(
+          `/api/recipes/user_recipes?page=${page}&limit=10`
+        );
+        console.log("Getting Recipes");
         const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setUserRecipes(data);
-          setTotalRecipes(data.length);
+        if (Array.isArray(data.userRecipes) && data.userRecipes.length > 0) {
+          setUserRecipes((prev) => {
+            const combined = [...prev, ...data.userRecipes];
+            const unique = Array.from(
+              new Map(combined.map((r) => [r._id, r])).values()
+            );
+            return unique;
+          });
+
+          setAllRecipes((prev) => {
+            const combined = [...prev, ...data.userRecipes];
+            const unique = Array.from(
+              new Map(combined.map((r) => [r._id, r])).values()
+            );
+            return unique;
+          });
+
+          setHasMore(data.hasMore);
         } else {
           setUserRecipes([]);
-          setTotalRecipes(0);
+          setHasMore(false);
         }
       } catch (error) {
         console.error("Error in Home page getting user recipes:", error);
         setUserRecipes([]);
-        setTotalRecipes(0);
       } finally {
         setLoading(false);
       }
     }
     getAllUserRecipes();
-  }, []);
+  }, [page]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { threshold: 1 }
+    );
+
+    if (loader.current) observer.observe(loader.current);
+    return () => loader.current && observer.unobserve(loader.current);
+  }, [hasMore]);
+
+  useEffect(() => {
+    if (selectedOption.toLowerCase() === "all") setUserRecipes(allRecipes);
+    else {
+      setUserRecipes(
+        // allRecipes.filter((recipe) =>
+        //   Object.values(recipe).some(
+        //     (field) =>
+        //       typeof field === "string" &&
+        //       field.toLowerCase().includes(selectedOption.toLowerCase())
+        //   )
+        // )
+        allRecipes.filter(
+          (item) =>
+            item.dietary?.toLocaleLowerCase() ===
+            selectedOption.toLocaleLowerCase()
+        )
+      );
+    }
+  }, [allRecipes, selectedOption]);
+
+  const handleFilter = (option) => {
+    setSelectedOption(option);
+  };
+
+  // const handleLike = async (id) => {
+  //   // setLikes((prev) => ({
+  //   //   ...prev,
+  //   //   [id]: !prev[id],
+  //   // }));
+  //   try {
+  //     const res = await fetch(`api/recipes/${id}`, {
+  //       method: "PATCH",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ likedBy: [session?.user?.name] }),
+  //     });
+  //     const data = await res.json();
+  //     alert(data.message);
+  //   } catch (error) {
+  //     console.error(error);
+  //     alert("Something Went wrong");
+  //   }
+  // };
+
+  const handleLike = async (id) => {
+    if (!session?.user?.name) {
+      alert("Please log in to like recipes.");
+      return;
+    }
+
+    const userName = session.user.name;
+    const currentLikes = likes[id] || [];
+    const hasLiked = currentLikes.includes(userName);
+
+    // Optimistic UI update
+    const optimisticLikes = hasLiked
+      ? currentLikes.filter((u) => u !== userName)
+      : [...currentLikes, userName];
+
+    setLikes((prev) => ({ ...prev, [id]: optimisticLikes }));
+
+    try {
+      const res = await fetch(`/api/recipes/${id}/like`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userName }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update like");
+      const data = await res.json();
+
+      // Replace with actual DB response
+      setLikes((prev) => ({ ...prev, [id]: data.likedBy }));
+    } catch (error) {
+      console.error("Like error:", error);
+
+      // Rollback UI on failure
+      setLikes((prev) => ({ ...prev, [id]: currentLikes }));
+    }
+  };
+
+  useEffect(() => {
+    if (userRecipes.length > 0) {
+      const initialLikes = {};
+      userRecipes.forEach((recipe) => {
+        initialLikes[recipe._id] = recipe.likedBy || [];
+      });
+      setLikes(initialLikes);
+    }
+  }, [userRecipes]);
+
   return (
     <>
-      <NavBar />
+      {/* <NavBar /> */}
 
       {/* Hero Section */}
       <div className="pt-16 ">
-        <div className="p-4 md:p-10 flex items-center justify-between">
+        <div className="p-4 md:p-8 flex items-center justify-between">
           <div>
             <h1 className="text-4xl text-black/90 font-bold ">
               Discover Recipes
@@ -110,7 +226,10 @@ export default function Home() {
                 {filterOptions.map((option, index) => (
                   <span
                     key={`${option}+${index}`}
-                    onClick={() => setSelectedOption(option)}
+                    onClick={() => {
+                      setSelectedOption(option);
+                      handleFilter(option);
+                    }}
                     className={`px-4 py-1 flex-shrink-0 whitespace-nowrap cursor-pointer transition-colors duration-200 ${
                       selectedOption === option
                         ? "bg-amber-500 text-white hover:bg-amber-400"
@@ -150,9 +269,9 @@ export default function Home() {
             <ResetIcon classname={`w-5 h-5 aspect-square fill-white `} />
           </div> */}
         <hr className="border-t border-gray-300" />
-        {loading?<Spinner/>:""}
-        <div className="bg-gray-100 p-3 md:px-8 mb-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 ">
-          {userRecipes.slice(0, totalRecipes).map((recipe, index) => {
+        {loading ? <Spinner /> : ""}
+        <div className="bg-gray-100 p-3 md:px-8 mb-10 md:mb-0 grid gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 sm:grid-cols-2 grid-cols-1 ">
+          {userRecipes.map((recipe, index) => {
             const randomBGClass = randomBG[index % randomBG.length];
 
             return (
@@ -195,13 +314,24 @@ export default function Home() {
                     </span>
                   </div>
                   <button
-                    onClick={() => setLikeState(!likeState)}
-                    className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleLike(recipe._id);
+                    }}
+                    className="absolute top-3 cursor-pointer right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition"
                   >
                     <LikeFilledIcon
-                      classname={`fill-gray-500  w-4 sm:w-5 md:w-6 cursor-pointer`}
+                      classname={`${
+                        likes[recipe._id]?.includes(session?.user?.name)
+                          ? "fill-red-500"
+                          : "fill-gray-500"
+                      } w-6 h-6 `}
                     />
+                    {/* <span className="ml-1 text-xs text-gray-600">
+                      {likes[recipe._id]?.length || 0}
+                    </span> */}
                   </button>
+
                   <span className="absolute top-0 bg-rose-500/90 font-medium rounded-tl-2xl rounded-br-xl p-1 text-white text-center">
                     &nbsp; &#8377;180 &nbsp;
                   </span>
@@ -210,7 +340,9 @@ export default function Home() {
                   <h5 className="font-medium text-xl text-black/90">
                     {recipe.title}
                   </h5>
-                  <p className="text-gray-700">{recipe.description}</p>
+                  <p className="text-gray-700 text-sm mt-1 mb-1">
+                    {recipe.description}
+                  </p>
                 </div>
 
                 <div className="px-3 pb-2 flex justify-between items-center">
@@ -241,7 +373,13 @@ export default function Home() {
 
                 {/* Order & Share button only,Like at top */}
                 <div className="w-full flex justify-start gap-1 p-2">
-                  <button className="w-[55%] cursor-pointer flex gap-1 relative overflow-hidden items-center text-amber-500 justify-center border border-amber-500 rounded-full p-1 group">
+                  <button
+                    className="w-[55%] cursor-pointer flex gap-1 relative overflow-hidden items-center text-amber-500 justify-center border border-amber-500 rounded-full p-1 group"
+                    onClick={() => {
+                      setOpen(true);
+                      setSelectedRecipe(recipe);
+                    }}
+                  >
                     <span className="absolute inset-0 bg-amber-500 transform -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0"></span>
                     <span className="relative z-10 flex items-center gap-1 transition-colors duration-300 group-hover:text-white">
                       <CartIcon classname="group-hover:fill-white fill-amber-500 w-4 h-4" />
@@ -263,176 +401,12 @@ export default function Home() {
             );
           })}
         </div>
+        {hasMore && <div ref={loader} className="h-10"></div>}
+
+        {isOpen && (
+          <Modal recipe={selectedRecipe} open={isOpen} setOpen={setOpen} />
+        )}
       </div>
     </>
   );
-}
-
-{
-  /* Recipe Card */
-}
-// <div className="rounded-2xl bg-white  pb-1 ">
-//   <div className="relative">
-//     <img
-//       src="/images/carouselimg3.jpg"
-//       alt="chef"
-//       className="w-full h-44 object-cover cursor-pointer  rounded-t-2xl"
-//     />
-//     <div className=" absolute bottom-2  left-2 flex flex-wrap gap-1">
-//       <span className="bg-black/70 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
-//         {time}
-//       </span>
-//       <span className="bg-green-500/80 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
-//         Dessert
-//       </span>
-//     </div>
-//     <button
-//       onClick={() => setLikeState(!likeState)}
-//       className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition"
-//     >
-//       <LikeFilledIcon
-//         classname={`fill-gray-500  w-4 sm:w-5 md:w-6 cursor-pointer`}
-//       />
-//     </button>
-//     <span className="absolute top-0 bg-rose-500/90 font-medium rounded-tl-xl rounded-br-xl p-1 text-white text-center">
-//       Rs.140
-//     </span>
-//   </div>
-//   <div className="p-2">
-//     <h5 className="font-medium text-xl text-black/90">
-//       Creamy Truffle Pasta
-//     </h5>
-//     <p className="text-gray-700">
-//       Rich and indulgent pasta with truffle cream sauce
-//     </p>
-//   </div>
-
-//   <div className="px-3 pb-2 flex justify-between items-center">
-//     <div className="flex   gap-2 items-center">
-//       <img
-//         src="/images/chef2.jpg"
-//         alt="chef"
-//         className="w-8 aspect-square object-cover  cursor-pointer  rounded-full"
-//       />
-//       <p>Chef Marco</p>
-//       <button
-//         onClick={() => setFollowState(!followState)}
-//         className={`bg-orange-400 text-white py-0.5 px-2 cursor-pointer transition-colors duration-150 ease-in rounded-full`}
-//       >
-//         {/* {followState ? "Following" : "Follow"} */}
-//         Follow
-//       </button>
-//     </div>
-//     <p className="font-medium">
-//       <span className="text-amber-500">★</span>4.8
-//     </p>
-//   </div>
-
-//   {/* Order & Share button only,Like at top */}
-//   <div className="w-full flex gap-1 p-2">
-//     <button className="w-full flex gap-1 items-center justify-center bg-amber-500 text-white rounded-full p-2">
-//       <CartIcon classname={`fill-white w-4 h-4`} />
-//       Order
-//     </button>
-//     <button className="bg-black/50 flex gap-1 items-center  text-white py-2 px-3 rounded-full">
-//       <ShareIcon classname={`fill-white w-5 h-5`} />
-//       Share
-//     </button>
-//   </div>
-// </div>
-
-{
-  /* Recipe Card */
-}
-// <div className="rounded-2xl bg-white  pb-1 ">
-//   <div className="relative">
-//     <img
-//       src="/images/carouselimg1.jpg"
-//       alt="chef"
-//       className="w-full h-44 object-cover cursor-pointer  rounded-t-2xl"
-//     />
-//     <div className=" absolute bottom-2  left-2 flex flex-wrap gap-1">
-//       <span className="bg-black/70 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
-//         {time}
-//       </span>
-//       <span className="bg-red-500/80 p-1 text-white rounded-full text-xs md:text-sm px-3 py-1 md:py-2 ">
-//         {type}
-//       </span>
-//     </div>
-//     <button
-//       onClick={() => setLikeState(!likeState)}
-//       className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-105 transition"
-//     >
-//       <LikeFilledIcon
-//         classname={`fill-gray-500  w-4 sm:w-5 md:w-6 cursor-pointer`}
-//       />
-//     </button>
-//     <span className="absolute top-0 bg-rose-500/90 font-medium rounded-tl-xl rounded-br-xl p-1 text-white text-center">
-//       {amount}
-//     </span>
-//   </div>
-//   <div className="p-2">
-//     <h5 className="font-medium text-xl text-black/90">
-//       Creamy Truffle Pasta
-//     </h5>
-//     <p className="text-gray-700">
-//       Rich and indulgent pasta with truffle cream sauce
-//     </p>
-//   </div>
-
-//   <div className="px-3 pb-2 flex justify-between items-center">
-//     <div className="flex   gap-2 items-center">
-//       <img
-//         src="/images/chef2.jpg"
-//         alt="chef"
-//         className="w-8 aspect-square object-cover  cursor-pointer  rounded-full"
-//       />
-//       <p>Chef Marco</p>
-//       <button
-//         onClick={() => setFollowState(!followState)}
-//         className={`bg-orange-400 text-white py-0.5 px-2 cursor-pointer transition-colors duration-150 ease-in rounded-full`}
-//       >
-//         {/* {followState ? "Following" : "Follow"} */}
-//         Follow
-//       </button>
-//     </div>
-//     <p className="font-medium">
-//       <span className="text-amber-500">★</span>4.8
-//     </p>
-//   </div>
-
-//   {/* Order & Share button only,Like at top */}
-//   <div className="w-full flex gap-1 p-2">
-//     <button className="w-full flex gap-1 items-center justify-center bg-amber-500 text-white rounded-full p-2">
-//       <CartIcon classname={`fill-white w-4 h-4`} />
-//       Order
-//     </button>
-//     <button className="bg-black/50 flex gap-1 items-center  text-white py-2 px-3 rounded-full">
-//       <ShareIcon classname={`fill-white w-5 h-5`} />
-//       Share
-//     </button>
-//   </div>
-// </div>
-
-{
-  /* <button className="relative overflow-hidden px-6 py-2 font-bold hover:text-white text-black border border-gray-800 rounded group">
-                    <span className="absolute inset-0 bg-blue-500 transform -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0 z-0"></span>
-
-                    <span className="relative z-10 ">Order</span>
-                  </button> */
-}
-
-{
-  /* <Link
-                    href="/order"
-                    class="relative inline-flex items-center justify-center p-1 w-[55%] overflow-hidden  transition duration-300 ease-out border border-black rounded-full group"
-                  >
-                    <span class="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-amber-500 group-hover:translate-x-0 ease">
-                      <CartIcon classname={`fill-white w-5 h-5`} />
-                    </span>
-                    <span class="absolute flex items-center justify-center w-full h-full text-amber-500 transition-all duration-300 transform group-hover:translate-x-full ease">
-                      Order
-                    </span>
-                    <span class="relative invisible">Order</span>
-                  </Link> */
 }

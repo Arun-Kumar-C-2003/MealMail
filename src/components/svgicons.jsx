@@ -175,11 +175,11 @@ export function ShareIcon({ classname }) {
   );
 }
 
-export function CrossIcon() {
+export function CrossIcon({classname}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="h-7 w-7"
+      className={classname}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -194,14 +194,12 @@ export function CrossIcon() {
   );
 }
 
-export function HamburgerIcon() {
+export function HamburgerIcon({ classname }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="h-7 w-7"
-      fill="none"
+      className={classname}
       viewBox="0 0 24 24"
-      stroke="currentColor"
     >
       <path
         strokeLinecap="round"

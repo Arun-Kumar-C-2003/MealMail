@@ -6,10 +6,10 @@ const collectionName = "recipes";
 const db = new DBConnect();
 // const db = await dbInstance.connect();
 
-export async function getAllRecipes() {
+export async function getAllRecipes({ page = 1, limit = 10 } = {}) {
   try {
-    const recipes = await db.getAll(collectionName);
-    // console.log('This is form recipeServic.js',recipes);
+    const skip = (page - 1) * limit;
+    const recipes = await db.getAll(collectionName, { skip, limit });
     return recipes;
   } catch (error) {
     console.error("Error fetching recipes:", error);
@@ -54,6 +54,7 @@ export async function getRecipeById(id) {
     }
 
     const recipe = await db.getOne({ _id: new ObjectId(id) }, collectionName);
+    console.log("This is the GetRecipeById service");
     return recipe;
   } catch (error) {
     console.error("Error in getRecipeById:", error);
@@ -128,6 +129,41 @@ export async function updateRecipe(id, updatedData) {
   return true;
 }
 
+// export async function updateRecipe(id, updatedData) {
+//   if (!ObjectId.isValid(id)) {
+//     throw new Error("Invalid recipe ID");
+//   }
+
+//   const objectId = new ObjectId(id.toString());
+
+//   // Add a timestamp
+//   updatedData.updatedAt = new Date();
+
+//   // Build dynamic Mongo update object
+//   const updateOps = {};
+
+//   for (const [key, value] of Object.entries(updatedData)) {
+//     if (Array.isArray(value)) {
+//       // Append array values (no duplicates)
+//       updateOps.$addToSet = updateOps.$addToSet || {};
+//       updateOps.$addToSet[key] = { $each: value };
+//     } else {
+//       // Replace or set a single field
+//       updateOps.$set = updateOps.$set || {};
+//       updateOps.$set[key] = value;
+//     }
+//   }
+
+//   const result = await db.updateOne(
+//     collectionName,
+//     { _id: objectId },
+//     updateOps
+//   );
+
+//   return result; // return the full result object (contains matchedCount, modifiedCount, etc.)
+// }
+
+
 export async function deleteRecipe(id) {
   if (!ObjectId.isValid(id)) {
     throw new Error("Invalid recipe ID");
@@ -145,3 +181,4 @@ export async function deleteRecipe(id) {
 
   return true;
 }
+

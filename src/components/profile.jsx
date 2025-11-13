@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Spinner } from "./home";
-import { useRouter } from "next/navigation";
+
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Profile() {
   const [postCount, setPostCount] = useState(0);
@@ -43,7 +43,7 @@ export default function Profile() {
   const renderContent = () => {
     if (activeIcon === "posts") {
       if (loading) {
-        return <Spinner />;
+        return <p className="text-center">Loading....</p>;
       }
       if (recipes.length === 0) {
         return <p className="text-center">No Posts</p>;
@@ -56,27 +56,14 @@ export default function Profile() {
               className="bg-white rounded-lg cursor-pointer hover:-translate-y-1 transition-transform duration-300 ease-in-out overflow-hidden shadow-md flex flex-col"
             >
               <img
-                src={recipe?.image?.url ?? "/images/cooking.jpg"}
+                src={
+                  recipe?.images?.find((img) => img.isCover)?.url ||
+                  "/images/cooking.jpg"
+                }
                 alt={recipe.title}
                 className="w-full h-48 object-cover"
                 onClick={() => router.push(`/recipedetails?id=${recipe._id}`)}
               />
-              {/* {recipe.image && recipe.image.url ? (
-                <img
-                  src={recipe.image.url}
-                  alt={recipe.title}
-                  className="w-full h-48 object-cover"
-                />
-              ) : (
-                <img
-                  src="/images/cooking.jpg"
-                  alt={recipe.title}
-                  className="w-full h-48 object-cover"
-                />
-              )} */}
-              {/* <div className="flex items-center justify-center h-48 bg-gray-100">
-                  <p className="text-gray-500 text-center">No image available</p>
-                </div> */}
               <div className="p-4 flex-1">
                 <p className="font-semibold text-lg text-center">
                   {recipe.title}
@@ -92,103 +79,93 @@ export default function Profile() {
       return <p className="text-center">No drafts</p>;
     }
   };
-
   const scrollToSection = () => {
     const el = document.getElementById("scrolltosection");
     el?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <div className="px-4 py-8 max-w-4xl mx-auto">
-      {/* Profile header */}
-      <div className="flex flex-col md:flex-row items-center justify-center md:items-start space-x-0 md:space-x-6 mb-8">
-        <div>
-          <img
-            src="/images/cooking.jpg"
-            alt="profile image"
-            className="w-36 h-36 rounded-full object-cover"
-          />
-        </div>
-        <div className="mt-4 md:mt-0 text-center md:text-left">
-          <div className="flex items-center justify-center gap-2 ms-2 md:justify-start space-x-3">
-            <span className="text-xl">{session?.user?.name || "Guest"}</span>
-            <button className="px-3 py-1  bg-gray-800 text-white rounded hover:bg-gray-700 transition">
-              Edit Profile
-            </button>
-          </div>
-          <div className="mt-4 flex space-x-6 justify-center md:justify-start">
-            <div className="text-center">
-              <h5 className="text-lg font-bold">{postCount}</h5>
-              <p
-                className="text-gray-500 cursor-pointer"
-                onClick={scrollToSection}
-              >
-                Recipes
-              </p>
-            </div>
-            <div className="text-center">
-              <h5 className="text-lg font-bold">{followers}</h5>
-              <p className="text-gray-500">Followers</p>
-            </div>
-            <div className="text-center">
-              <h5 className="text-lg font-bold">{following}</h5>
-              <p className="text-gray-500">Following</p>
+    <div className="mt-10 border-t border-gray-200  flex justify-center">
+      <div className="shadow-xl py-8 px-10">
+        <div className="flex  gap-30">
+          {/* Profile Picture */}
+          <div>
+            <img
+              src="/images/cooking.jpg"
+              alt="profile image"
+              className="w-36 h-36 rounded-full object-cover"/>
+
+            <div className="flex justify-center mt-5 pl-10">
+              <span className=" text-xl font-semibold">
+                {session?.user?.name || "Guest"}
+              </span>
             </div>
           </div>
+          {/* Post Count */}
+          <div className="mt-12">
+            <h5 className="text-lg font-bold">{postCount}</h5>
+            <p
+              className="text-gray-500 cursor-pointer"
+              onClick={scrollToSection}>
+              Recipes
+            </p>
+          </div>
+          {/* User Info */}
+          <div>
+            <h5 className="text-lg font-bold mt-12">{followers}</h5>
+            <p className="text-gray-500">Followers</p>
+          </div>
+          {/* Following */}
+          <div className="">
+            <h5 className="text-lg font-bold mt-12">{following}</h5>
+            <p className="text-gray-500">Following</p>
+
+          </div>
         </div>
-      </div>
+        <div className="border-t border-gray-200 mt-6">
+          <section className="mt-10">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold">My Creations</h2>
+              <button className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600">
+                + Add Recipe
+              </button>
+            </div>
 
-      {/* Icons navigation */}
-      <div className="flex justify-center space-x-16 mb-6">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="30"
-          viewBox="0 -960 960 960"
-          width="30"
-          className={`cursor-pointer ${
-            activeIcon === "posts" ? "fill-orange-600" : "fill-gray-900"
-          }`}
-          onClick={() => setActiveIcon("posts")}
-          title="Posts"
-        >
-          <path d="M168-192q-29 0-50.5-21.5T96-264v-432q0-30 21.5-51t50.5-21h216l96 96h312q30 0 51 21t21 51v336q0 29-21 50.5T792-192H168Z" />
-        </svg>
-
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="30"
-          viewBox="0 -960 960 960"
-          width="30"
-          className={`cursor-pointer ${
-            activeIcon === "orders" ? "fill-orange-600" : "fill-gray-900"
-          }`}
-          onClick={() => setActiveIcon("orders")}
-          title="Order History"
-        >
-          <path d="m670-140 160-100-160-100v200ZM240-600h480v-80H240v80ZM720-40q-83 0-141.5-58.5T520-240q0-83 58.5-141.5T720-440q83 0 141.5 58.5T920-240q0 83-58.5 141.5T720-40ZM120-80v-680q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v267q-28-14-58.5-20.5T720-520H240v80h284q-17 17-31.5 37T467-360H240v80h203q-2 10-2.5 19.5T440-240q0 42 11.5 80.5T486-86l-6 6-60-60-60 60-60-60-60 60-60-60-60 60Z" />
-        </svg>
-
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="30"
-          viewBox="0 -960 960 960"
-          width="30"
-          className={`cursor-pointer ${
-            activeIcon === "drafts" ? "fill-orange-600" : "fill-gray-900"
-          }`}
-          onClick={() => setActiveIcon("drafts")}
-          title="Drafts"
-        >
-          <path d="M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520h200L520-800v200Z" />
-        </svg>
-      </div>
-
-      {/* Content Section */}
-      <div
-        id="scrolltosection"
-        className="border border-gray-300 rounded-lg p-4"
-      >
-        {renderContent()}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {recipes.map((recipe, index) => (
+                <div
+                  key={index}
+                  className="bg-white shadow-md rounded-2xl overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  <img
+                    src={
+                      recipe?.images?.find((img) => img.isCover)?.url ||
+                      "/images/cooking.jpg"
+                    }
+                    alt={recipe.name}
+                    className="w-full h-48 object-cover"
+                    onClick={() => setActiveIcon("posts")}
+                    title="Posts"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold mb-1">
+                      {recipe.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {recipe.description}
+                    </p>
+                    <div className="flex justify-between items-center text-sm text-gray-500">
+                      <span>⭐ {recipe.rating || "4.5"}</span>
+                      <button className="text-orange-500 hover:underline">
+                        View
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );

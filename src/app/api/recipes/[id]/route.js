@@ -1,8 +1,8 @@
 import {
   updateRecipe,
-  getRecipeById,
   deleteRecipe,
-} from "@/server/services/recipeservice";
+  getRecipeById,
+} from "@/server/services/recipeService";
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
@@ -15,7 +15,7 @@ export async function GET(request, { params }) {
         { status: 400 }
       );
     }
-
+    console.log("This is the GET method in route.js[id]");
     const recipe = await getRecipeById(id);
 
     if (!recipe) {
@@ -92,5 +92,73 @@ export async function PUT(request, context) {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
+  }
+}
+
+// export async function PATCH(request, { params }) {
+//   const { id } = await params;
+//   const body = await request.json();
+
+//   try {
+//     // Prepare dynamic update operators
+//     const operators = {};
+//     for (const key in body) {
+//       const value = body[key];
+
+//       // If field is array-like (e.g., likedBy) or explicitly an array, use $addToSet
+//       if (Array.isArray(value) || key === "likedBy") {
+//         operators.$addToSet = operators.$addToSet || {};
+//         operators.$addToSet[key] = {
+//           $each: Array.isArray(value) ? value : [value],
+//         };
+//       } else {
+//         operators.$set = operators.$set || {};
+//         operators.$set[key] = value;
+//       }
+//     }
+
+//     const result = await updateRecipe(id, operators);
+
+//     if (result.matchedCount === 0) {
+//       return NextResponse.json(
+//         { success: false, message: "Recipe not found" },
+//         { status: 404 }
+//       );
+//     }
+
+//     return NextResponse.json(
+//       { success: true, message: "Successfully updated" },
+//       { status: 200 }
+//     );
+//   } catch (error) {
+//     console.error("Error in PATCH (updating data):", error);
+//     return NextResponse.json(
+//       { success: false, message: "Internal Server Error" },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+export async function PATCH(request, { params }) {
+  const { id } = await params;
+  const body = await request.json();
+  try {
+    const result = await updateRecipe(id, body);
+    if (result.matchedCount === 0) {
+      return NextResponse.json(
+        { success: false, message: "Recipe not found" },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json(
+      { success: true, message: "Successfully updated" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error in patch(updating the data)", error);
+    return NextResponse.json(
+      { success: false, message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

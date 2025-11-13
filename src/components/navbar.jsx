@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import {
   HomeIcon,
   AddIcon,
@@ -9,9 +10,17 @@ import {
   SearchIcon,
   StoreIcon,
   DeliveryIcon,
+  HamburgerIcon,
+  NotificationIcon,
+  CrossIcon,
 } from "./svgicons";
-
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { MdOutlineCollectionsBookmark } from "react-icons/md";
+import { MdOutlineMenuBook } from "react-icons/md";
+import { RiLogoutCircleRLine } from "react-icons/ri";
+import { MdBorderColor } from "react-icons/md";
+import { IoSettingsOutline } from "react-icons/io5";
 
 export default function NavBar() {
   const navLinks = [
@@ -25,27 +34,36 @@ export default function NavBar() {
     { icon: HomeIcon, link: "home" },
     { icon: SearchIcon, link: "search" },
     { icon: AddIcon, link: "addrecipe" },
+    { icon: DeliveryIcon, link: "orders" },
     { icon: StoreIcon, link: "stores" },
   ];
+
+  const router = useRouter();
   const pathname = usePathname();
   const isLogoActive = pathname === navLinks[0].linkTo;
-  // const isActive = navLinks.some((link) => pathname === `/${link.linkTo}`);
 
   const navigator = (href) => {
-    const router = useRouter();
-    if (router.pathname !== href) {
+    if (pathname !== href) {
       router.push(href);
     }
   };
 
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOutside = () => setOpen(false);
+    window.addEventListener("click", handleOutside);
+    return () => window.removeEventListener("click", handleOutside);
+  }, []);
+
   return (
-    <>
+    <div>
       <header className="bg-white fixed z-50 top-0 shadow w-full">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3 relative">
+        <nav className="max-w-full mx-auto flex items-center justify-between px-5 md:px-8 py-3 relative">
           <Link
             href="/home"
             aria-disabled={isLogoActive}
-            className="text-2xl font-bold text-white bg-amber-500 p-2 rounded-md hover:bg-amber-400 transition-colors duration-150 ease-in "
+            className="text-2xl font-bold hover:scale-105 text-white bg-amber-500 p-2 rounded-md hover:bg-amber-400 transition duration-150 ease-in "
           >
             MealMail
           </Link>
@@ -57,13 +75,11 @@ export default function NavBar() {
                 <Link
                   key={`${link.linkName + index}`}
                   href={href}
-                  // href={`/${link.linkTo == "home" ? "home" : link.linkTo}`}
                   aria-disabled={isActive}
                   className={`${
                     isActive ? "text-amber-500" : "text-black/90"
                   } p-2 bg-transparent  hover:text-amber-500 rounded-md  transition-colors duration-150 ease-in`}
                 >
-                  {/* {link.charAt(0).toUpperCase() + link.slice(1)} */}
                   {link.linkName}
                 </Link>
               );
@@ -71,41 +87,95 @@ export default function NavBar() {
           </ul>
 
           <div className="flex space-x-7 items-center">
-            <div className="hidden md:flex items-center border border-gray-600 rounded-full p-1 focus-within:border-transparent focus-within:ring-2 focus-within:ring-amber-500">
+            <div
+              className="hidden md:flex items-center hover:shadow-md transition cursor-pointer bg-gray-50 gap-1 shadow rounded-xl py-1 px-5"
+              onClick={() => router.push("/search")}
+            >
               {/* Icon */}
-              <SearchIcon classname="fill-gray-400 w-8 h-8" />
+              <SearchIcon classname="fill-gray-700 w-6 h-6" />
 
               {/* Input */}
-              <input
+              {/* <input
                 type="text"
                 placeholder="Search recipes, creators..."
-                className="ml-2 w-full outline-none bg-transparent"
-              />
+                className="ml-2 placeholder-gray-500 w-full outline-none bg-transparent"
+              /> */}
+              <p className="text-gray-700  text-lg  ">search</p>
             </div>
 
             {/* Liked Recipes Button */}
-            <button title="liked">
-              <LikeFilledIcon classname="w-6 cursor-pointer h-6 transition-colors duration-150 ease-in hover:fill-amber-500 fill-gray-700" />
-            </button>
+            <div className="flex  items-baseline space-x-7">
+              <button title="liked ">
+                <LikeFilledIcon classname="w-6 cursor-pointer h-6 transition-colors duration-150 ease-in hover:fill-amber-500 fill-gray-700" />
+              </button>
+              <button title="liked ">
+                <NotificationIcon classname="w-6 cursor-pointer h-6 transition-colors duration-150 ease-in hover:fill-amber-500 fill-gray-700" />
+              </button>
 
-            {/* Cart Button */}
-            <button title="cart">
-              <CartIcon
-                classname={`w-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer h-6 fill-gray-700`}
-              />
-            </button>
+              {/* Cart Button */}
+              <div className="relative">
+                <button title="cart" onClick={() => router.push("/cart")}>
+                  <CartIcon classname="w-6 h-6 fill-gray-700 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer" />
+                </button>
+              </div>
+              {pathname === "/profile" ? (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpen((prev) => !prev);
+                  }}
+                >
+                  {open ? (
+                    <CrossIcon classname="w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700" />
+                  ) : (
+                    <HamburgerIcon
+                      classname={`w-6 h-6 transition-colors duration-150 ease-in hover:stroke-amber-500 cursor-pointer stroke-gray-700`}
+                    />
+                  )}
+                </button>
+              ) : (
+                <button title="profile" onClick={() => router.push("/profile")}>
+                  <ProfileIcon
+                    classname={`w-7 h-7 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer fill-gray-700`}
+                  />
+                </button>
+              )}
+              {open && pathname === "/profile" && (
+                <div className="absolute right-6 mt-15 w-58  h-auto bg-white shadow-lg rounded-xl z-50 p-2">
+                  <button className="flex items-center gap-3 w-full text-center px-15 py-4 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
+                    <MdOutlineMenuBook className="text-xl" />
+                    <span>Menu</span>
+                  </button>
 
-            {/* Profile Icon => User Profile Appears Instead of Icon */}
-            <button title="profile">
-              <ProfileIcon
-                classname={`w-6 h-6 transition-colors duration-150 ease-in hover:fill-amber-500 cursor-pointer fill-gray-700`}
-              />
-            </button>
+                  <button className="flex  gap-3  text-center px-15 py-4 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
+                    <MdOutlineCollectionsBookmark className="h-7 text-xl" />
+                    <span>Collection</span>
+                  </button>
+
+                  <button className="flex items-center gap-3 w-full text-left px-15 py-4 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
+                    <MdBorderColor className="text-xl" />
+                    <span>Order</span>
+                  </button>
+
+                  <button className="flex items-center gap-3 w-full text-left px-15 py-4 text-gray-700 rounded-md hover:bg-amber-50 hover:text-amber-600 transition">
+                    <IoSettingsOutline className="text-xl" />
+                    <span>Settings</span>
+                  </button>
+
+                  <div className="border-t" />
+                  <button
+                    className="flex gap-3 w-full text-center px-15 py-5 text-gray-700 rounded-md hover:bg-red-50 hover:text-red-500 transition"
+                    onClick={() => signOut({ callbackUrl: "/login" })}
+                  >
+                    <RiLogoutCircleRLine className="text-xl" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </nav>
       </header>
-
-      {/* Bottom Navigation for mobile devices */}
       <footer className="md:hidden flex w-full fixed z-50 bottom-0 bg-gray-800 py-2 px-10 rounded-t-md">
         <div className="w-full text-white flex justify-between">
           {iconsPath.map((item, index) => {
@@ -115,7 +185,6 @@ export default function NavBar() {
               <Link
                 key={`${item.link + index}`}
                 href={href}
-                // href={`/${link.linkTo == "home" ? "home" : link.linkTo}`}
                 aria-disabled={isActive}
                 className={`${
                   isActive ? "bg-amber-500 rounded-md" : ""
@@ -128,27 +197,6 @@ export default function NavBar() {
           })}
         </div>
       </footer>
-    </>
+    </div>
   );
-}
-
-{
-  /* <div className="w-full text-white flex justify-between">
-  <button>
-    <HomeIcon classname={`fill-gray-200 w-5 h-5`} />
-  </button>
-  <button>
-    <SearchIcon classname={`fill-gray-200 w-5 h-5`} />
-  </button>
-  <button>
-    <AddIcon classname={`fill-gray-200 w-5 h-5`} />
-  </button>
-  <button>
-    <StoreIcon classname={`fill-gray-200 w-5 h-5`} />
-  </button>
-</div>; */
-}
-
-{
-  /* <DeliveryIcon classname={`fill-gray-200 w-5 h-5`} /> */
 }
