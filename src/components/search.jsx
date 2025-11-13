@@ -74,7 +74,7 @@ export default function Search() {
         )}
       </div>
 
-      <div className="flex justify-center items-center gap-25 mt-10 flex mt-1 md:ml-2 overflow-x-100 no-scrollbar scroll-smooth items-baseline gap-2">
+      <div className="flex justify-center items-center gap-25 mt-10 md:ml-2 overflow-x-100 no-scrollbar scroll-smooth ">
         <img src="/food1.jpg" className="w-14 h-14 rounded-lg" />
         <img src="/food1.jpg" className="w-14 h-14 rounded-lg" />
         <img src="/food1.jpg" className="w-14 h-14 rounded-lg" />
@@ -82,7 +82,7 @@ export default function Search() {
         <img src="/food1.jpg" className="w-14 h-14 rounded-lg" />
       </div>
 
-      <div className="flex gap-28 mt-5 flex mt-1 md:ml-2 overflow-x-auto no-scrollbar scroll-smooth items-baseline gap-2">
+      <div className="flex gap-28 mt-5   md:ml-2 overflow-x-auto no-scrollbar scroll-smooth items-baseline ">
         <p>Breakfast</p>
         <p>Coffee</p>
         <p>Lunch</p>
